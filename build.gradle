@@ -11,7 +11,7 @@ subprojects {
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
     java.withJavadocJar()
-        
+
     jar {
         from(rootProject.file("LICENSE")) {
             rename { "${it}_${mod_name}" }
@@ -48,10 +48,24 @@ subprojects {
             name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
             url = 'https://maven.blamejared.com'
         }
+        maven {
+            url "https://www.cursemaven.com"
+        }
+        maven {
+            url "https://maven.architectury.dev/"
+        }
+
+        maven {
+            url "https://maven.saps.dev/minecraft"
+            content {
+                includeGroup "dev.latvian.mods"
+                includeGroup "dev.ftb.mods"
+            }
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
-    
+
         it.options.encoding = 'UTF-8'
         it.options.getRelease().set(17)
     }

@@ -11,7 +11,7 @@ mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
     config("${mod_id}.mixins.json")
-    config("${mod_id}.forge.mixins.json")
+
 }
 
 minecraft {
@@ -76,6 +76,13 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    implementation fg.deobf("curse.maven:journeymap-32274:${journeymap_forge}")
+    implementation fg.deobf("curse.maven:ftbteams-404468:${ftbteams_forge}")
+
+    runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    runtimeOnly fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
+
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
