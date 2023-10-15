@@ -62,6 +62,10 @@ subprojects {
                 includeGroup "dev.ftb.mods"
             }
         }
+        maven {
+            name = "JourneyMap (Public)"
+            url = "https://jm.gserv.me/repository/maven-public/"
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {
