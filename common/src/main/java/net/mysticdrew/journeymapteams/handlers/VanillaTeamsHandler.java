@@ -18,4 +18,10 @@ public class VanillaTeamsHandler implements Handler
         var localPlayer = Minecraft.getInstance().player;
         return 0;
     }
+
+    @Override
+    public void createConfigs()
+    {
+
+    }
 }
