@@ -1,8 +1,9 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'maven-publish'
     id 'fabric-loom'
+    id 'net.darkhax.curseforgegradle' version '1.+'
+    id 'com.modrinth.minotaur' version '2.+'
 }
 base {
     archivesName = "${mod_name}-fabric-${minecraft_version}"
@@ -61,16 +62,65 @@ processResources {
     from project(":common").sourceSets.main.resources
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            from components.java
-        }
+jar {
+    dependsOn 'processDocs'
+    manifest {
+        attributes([
+                "Specification-Title"     : project.name,
+                "Specification-Vendor"    : project.group_id,
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${archiveVersion}",
+                "Implementation-Vendor"   : project.group_id,
+                "Implementation-Timestamp": getDate()
+        ])
     }
-    repositories {
-        maven {
-            url "file://" + System.getenv("local_maven")
-        }
+}
+
+task processDocs(type: Copy) {
+    // update docs
+    from(file("$rootDir/doc/")) {
+        include '*.html'
+        expand 'version': project.version,
+                'date': getDate(),
+                'mcversion': project.minecraft_version,
+                'loaderversion': project.fabric_version,
+                'loadername': "Fabric"
     }
+    into "$project.buildDir/doc"
+}
+
+if (!project.hasProperty("curseForgeApiKey")) {
+    ext.curseForgeApiKey = project.findProperty("curseforge_api_key") ?: "notset"
+}
+if (!project.hasProperty("modrinthApiKey")) {
+    ext.modrinthApiKey = project.findProperty("modrinth_api_key") ?: "notset"
+}
+
+task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+
+    apiToken = "${curseForgeApiKey}"
+    def mainFile = upload(curseforge_project_id, remapJar)
+    mainFile.displayName = "${archivesBaseName}-${version}"
+    mainFile.releaseType = release_type
+    mainFile.addModLoader("Fabric", "Quilt")
+    mainFile.addJavaVersion("Java 17")
+    mainFile.addGameVersion("${project.minecraft_version}")
+    mainFile.changelogType = "html"
+    mainFile.changelog = file("$project.buildDir/doc/changelog.html")
+}
+
+
+tasks.modrinth.dependsOn(tasks.build)
+
+modrinth {
+    token = "${modrinthApiKey}"
+    projectId = modrinth_project_id
+    versionNumber = "${version}"
+    versionName = "${archivesBaseName}-${version}"
+    versionType = release_type
+    uploadFile = remapJar
+    gameVersions = ["${project.minecraft_version}"]
+    loaders = ["fabric", "quilt"]
+    changelog = file("$project.buildDir/doc/changelog.html").exists() ? file("$project.buildDir/doc/changelog.html").text : null
 }
