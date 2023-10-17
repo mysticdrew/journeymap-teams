@@ -14,11 +14,16 @@
   "license": "${license}",
   "icon": "assets/modid/${mod_id}.png",
   "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.mysticdrew.journeymapteams.JourneyMapTeamsFabric"
+    ]
+  },
   "mixins": [
     "${mod_id}.mixins.json"
   ],
   "journeymap": [
-    "net.mysticdrew.journeymapftbteams.client.JourneyMapClientPlugin"
+    "net.mysticdrew.journeymapteams.client.JourneyMapClientPlugin"
   ],
   "depends": {
     "fabricloader": ">=0.14",

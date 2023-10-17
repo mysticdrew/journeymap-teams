@@ -1,23 +1,22 @@
-package net.mysticdrew.journeymapftbteams.client;
+package net.mysticdrew.journeymapteams.client;
 
-import dev.ftb.mods.ftbteams.FTBTeamsAPI;
-import dev.ftb.mods.ftbteams.data.ClientTeam;
 import journeymap.client.api.ClientPlugin;
 import journeymap.client.api.IClientAPI;
 import journeymap.client.api.IClientPlugin;
 import journeymap.client.api.event.ClientEvent;
 import journeymap.client.api.event.forge.EntityRadarUpdateEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.mysticdrew.journeymapftbteams.Constants;
+import net.mysticdrew.journeymapteams.Constants;
+import net.mysticdrew.journeymapteams.client.integration.JourneyMapCommonPlugin;
 
 @ClientPlugin
 public class JourneyMapClientPlugin implements IClientPlugin
 {
     @Override
-    public void initialize(IClientAPI iClientAPI)
+    public void initialize(IClientAPI api)
     {
+        JourneyMapCommonPlugin.registerEvents(api);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -26,17 +25,8 @@ public class JourneyMapClientPlugin implements IClientPlugin
     {
         if (event.getType() == EntityRadarUpdateEvent.EntityType.PLAYER)
         {
-            ClientTeam remotePlayer = FTBTeamsAPI.getClientManager().getTeam(event.getWrappedEntity().getEntityLivingRef().get().getUUID());
-            ClientTeam localPlayer = FTBTeamsAPI.getClientManager().getTeam(Minecraft.getInstance().player.getUUID());
-
-            if (remotePlayer != null
-                    && localPlayer != null
-                    && remotePlayer.manager.getManagerId() == localPlayer.manager.getManagerId())
-            {
-                event.getWrappedEntity().setColor(localPlayer.getColor());
-            }
+            JourneyMapCommonPlugin.getInstance().setPlayerColor(event.getWrappedEntity());
         }
-
     }
 
     @Override
@@ -48,6 +38,6 @@ public class JourneyMapClientPlugin implements IClientPlugin
     @Override
     public void onEvent(ClientEvent clientEvent)
     {
-
+        JourneyMapCommonPlugin.getInstance().handleEvents(clientEvent);
     }
 }
