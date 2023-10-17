@@ -5,9 +5,11 @@ plugins {
     id 'net.darkhax.curseforgegradle' version '1.+'
     id 'com.modrinth.minotaur' version '2.+'
 }
+
 base {
     archivesName = "${mod_name}-fabric-${minecraft_version}"
 }
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()

@@ -40,7 +40,7 @@ public class JourneyMapCommonPlugin
     {
         if (ClientEvent.Type.REGISTRY.equals(clientEvent.type) && ((RegistryEvent) clientEvent).getRegistryType().equals(RegistryEvent.RegistryType.OPTIONS))
         {
-            handler.createConfigs();
+
         }
     }
 
