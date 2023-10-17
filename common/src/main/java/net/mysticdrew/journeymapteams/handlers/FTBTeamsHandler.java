@@ -20,14 +20,17 @@ public class FTBTeamsHandler implements Handler
     {
         var localTeam = FTBTeamsAPI.getManager().getPlayerTeam(localPlayer.getUUID());
         var remoteTeam = FTBTeamsAPI.getManager().getPlayerTeam(remotePlayer.getUUID());
-
-        var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
-
-        if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp)
+        if (localTeam != null && remoteTeam != null)
         {
-            return visible;
+            var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
+
+            if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp)
+            {
+                return visible;
+            }
+            return false;
         }
-        return false;
+        return visible;
     }
 
     @Override
@@ -50,11 +53,5 @@ public class FTBTeamsHandler implements Handler
             }
         }
         return properties.defaultTeamColor.get().getColor();
-    }
-
-    @Override
-    public void createConfigs()
-    {
-
     }
 }

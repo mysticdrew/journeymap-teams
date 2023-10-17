@@ -7,6 +7,4 @@ public interface Handler
     boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible);
 
     int getRemotePlayerColor(Player remotePlayer);
-
-    void createConfigs();
 }

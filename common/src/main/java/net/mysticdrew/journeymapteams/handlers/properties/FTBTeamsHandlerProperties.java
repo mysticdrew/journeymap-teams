@@ -16,9 +16,8 @@ public class FTBTeamsHandlerProperties
 
     public FTBTeamsHandlerProperties()
     {
-        //TODO: i18n
         this.defaultTeamColor = new EnumOption<>(category, "default-team-color", "prop.option.label.ftb.default.team_color", Color.GREEN);
         this.doOverrideAllyColor = new BooleanOption(category, "over-ride-ally-color", "prop.option.label.ftb.override_ally", false);
-        this.overrideAllyColor = new EnumOption<>(category, "default-ally-color", "prop.category.label.vanilla", Color.BLUE);
+        this.overrideAllyColor = new EnumOption<>(category, "default-ally-color", "prop.option.label.ftb.override_ally", Color.BLUE);
     }
 }
