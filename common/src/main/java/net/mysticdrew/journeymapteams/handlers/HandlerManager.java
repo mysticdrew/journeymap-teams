@@ -24,6 +24,17 @@ public enum HandlerManager
         handlerMap.put("ftbteams", FTBTeamsHandler.class);
     }
 
+    /**
+     * Add any handlers for mods only on specific mod loaders.
+     *
+     * @param modId - modId
+     * @param cls   - the HandlerClass
+     */
+    public <T extends Handler> void addLoaderHandler(String modId, Class<T> cls)
+    {
+        handlerMap.put(modId, cls);
+    }
+
     public Handler getHandler(String modId)
     {
         return this.getHandler(Collections.singletonList(modId));
