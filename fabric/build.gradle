@@ -15,10 +15,14 @@ dependencies {
     mappings loom.officialMojangMappings()
 
     modImplementation "curse.maven:journeymap-32274:${journeymap_fabric}"
-    modImplementation "dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}"
-    modImplementation "dev.ftb.mods:ftb-library-fabric:${ftb_library_version}"
+    modImplementation ("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
+        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
+    }
+    modImplementation ("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
+        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
+    }
 
-    modApi "info.journeymap:journeymap-api:1.19.1-${journeymap_api_version}-fabric-SNAPSHOT"
+    modImplementation "info.journeymap:journeymap-api:1.19.1-${journeymap_api_version}-fabric-SNAPSHOT"
 
     modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "mod_id",
+  "id": "${mod_id}",
   "version": "${version}",
   "name": "${mod_name}",
   "description": "${description}",
@@ -17,13 +17,13 @@
   "entrypoints": {
     "main": [
       "net.mysticdrew.journeymapteams.JourneyMapTeamsFabric"
+    ],
+    "journeymap": [
+      "net.mysticdrew.journeymapteams.client.JourneyMapClientPlugin"
     ]
   },
   "mixins": [
     "${mod_id}.mixins.json"
-  ],
-  "journeymap": [
-    "net.mysticdrew.journeymapteams.client.JourneyMapClientPlugin"
   ],
   "depends": {
     "fabricloader": ">=0.14",

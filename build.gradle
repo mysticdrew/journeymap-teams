@@ -62,6 +62,9 @@ subprojects {
                 includeGroup "dev.ftb.mods"
             }
         }
+
+        maven { url "https://maven.shedaniel.me" }
+
         maven {
             name = "JourneyMap (Public)"
             url = "https://jm.gserv.me/repository/maven-public/"

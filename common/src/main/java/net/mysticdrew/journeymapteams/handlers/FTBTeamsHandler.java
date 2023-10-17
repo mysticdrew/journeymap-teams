@@ -3,7 +3,6 @@ package net.mysticdrew.journeymapteams.handlers;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.TeamRank;
 import dev.ftb.mods.ftbteams.api.property.TeamProperties;
-import dev.ftb.mods.ftbteams.api.property.TeamPropertyValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.mysticdrew.journeymapteams.handlers.properties.FTBTeamsHandlerProperties;
