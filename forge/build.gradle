@@ -33,6 +33,7 @@ minecraft {
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Client'
             property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.debug.export', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 modClientRun {
@@ -43,10 +44,11 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run')
+            workingDirectory project.file('run/server')
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Server'
             property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.debug.export', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
                 modServerRun {
@@ -79,10 +81,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     implementation fg.deobf("curse.maven:journeymap-32274:${journeymap_forge}")
-    implementation fg.deobf("curse.maven:ftbteams-404468:${ftbteams_forge}")
+    implementation fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
+    implementation fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
 
     runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
-    runtimeOnly fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
 
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")

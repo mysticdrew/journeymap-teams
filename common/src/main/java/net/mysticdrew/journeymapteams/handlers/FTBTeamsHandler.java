@@ -1,7 +1,9 @@
 package net.mysticdrew.journeymapteams.handlers;
 
-import dev.ftb.mods.ftbteams.FTBTeamsAPI;
-import dev.ftb.mods.ftbteams.data.ClientTeam;
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
+import dev.ftb.mods.ftbteams.api.TeamRank;
+import dev.ftb.mods.ftbteams.api.property.TeamProperties;
+import dev.ftb.mods.ftbteams.api.property.TeamPropertyValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.mysticdrew.journeymapteams.handlers.properties.FTBTeamsHandlerProperties;
@@ -18,13 +20,14 @@ public class FTBTeamsHandler implements Handler
     @Override
     public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
     {
-        var localTeam = FTBTeamsAPI.getManager().getPlayerTeam(localPlayer.getUUID());
-        var remoteTeam = FTBTeamsAPI.getManager().getPlayerTeam(remotePlayer.getUUID());
-        if (localTeam != null && remoteTeam != null)
+        var localTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(localPlayer.getUUID());
+        var remoteTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(remotePlayer.getUUID());
+        if (localTeam.isPresent() && remoteTeam.isPresent())
         {
-            var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
+            var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
+                    || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
 
-            if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp)
+            if ((remoteTeam.get().getId() == localTeam.get().getId() || allied) || isOp)
             {
                 return visible;
             }
@@ -37,19 +40,25 @@ public class FTBTeamsHandler implements Handler
     public int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;
-        var knownRemotePlayer = FTBTeamsAPI.getClientManager().getKnownPlayer(remotePlayer.getUUID());
-        var knownLocalPlayer = FTBTeamsAPI.getClientManager().getKnownPlayer(localPlayer.getUUID());
-        if (knownRemotePlayer != null && knownLocalPlayer != null)
+        var knownRemotePlayer = FTBTeamsAPI.api().getClientManager().getKnownPlayer(remotePlayer.getUUID());
+        var knownLocalPlayer = FTBTeamsAPI.api().getClientManager().getKnownPlayer(localPlayer.getUUID());
+        if (knownRemotePlayer.isPresent() && knownLocalPlayer.isPresent())
         {
-            ClientTeam remoteTeam = FTBTeamsAPI.getClientManager().getTeam(knownRemotePlayer.teamId);
-            ClientTeam localTeam = FTBTeamsAPI.getClientManager().getTeam(knownLocalPlayer.teamId);
-
-            var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
-            if (remoteTeam != null
-                    && localTeam != null
-                    && remoteTeam.getId() == localTeam.getId() || allied)
+            var remoteTeam = FTBTeamsAPI.api().getClientManager().getTeamByID(knownRemotePlayer.get().teamId());
+            var localTeam = FTBTeamsAPI.api().getClientManager().getTeamByID(knownLocalPlayer.get().teamId());
+            if (localTeam.isPresent() && remoteTeam.isPresent())
             {
-                return allied && properties.doOverrideAllyColor.get() ? properties.overrideAllyColor.get().getColor() : remoteTeam.getColor();
+                var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
+                        || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
+
+                if (remoteTeam.get().getId() == localTeam.get().getId() || allied)
+                {
+                    return allied && properties.doOverrideAllyColor.get()
+                            ? properties.overrideAllyColor.get().getColor()
+                            : remoteTeam.get().getProperty(TeamProperties.COLOR).rgb();
+                }
+
+
             }
         }
         return properties.defaultTeamColor.get().getColor();
