@@ -15,16 +15,22 @@ dependencies {
     mappings loom.officialMojangMappings()
 
     modImplementation "curse.maven:journeymap-32274:${journeymap_fabric}"
-    modImplementation ("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
+    // FTB Teams Deps
+    modCompileOnly("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
         exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
     }
-    modImplementation ("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
         exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
     }
+    //    modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
+
+    // Argonauts deps
+    modImplementation "earth.terrarium.argonauts:argonauts-fabric-${minecraft_version}:${argonauts_version}"
+    modImplementation "com.teamresourceful.resourcefullib:resourcefullib-fabric-${minecraft_version}:${resourceful_lib_version}"
+    modImplementation "eu.pb4:placeholder-api:${placeholder_api_version}"
 
     modImplementation "info.journeymap:journeymap-api:1.19.1-${journeymap_api_version}-fabric-SNAPSHOT"
 
-    modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
 
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"

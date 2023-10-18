@@ -81,10 +81,15 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     implementation fg.deobf("curse.maven:journeymap-32274:${journeymap_forge}")
-    implementation fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
-    implementation fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
 
-    runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+    // Argonauts deps
+    implementation fg.deobf("earth.terrarium.argonauts:argonauts-forge-${minecraft_version}:${argonauts_version}")
+    implementation fg.deobf("com.teamresourceful.resourcefullib:resourcefullib-forge-${minecraft_version}:${resourceful_lib_version}")
+
+    // FTB Teams Deps
+    compileOnly fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
+    compileOnly fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
+//    runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
 
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")

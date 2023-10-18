@@ -18,6 +18,10 @@ dependencies {
     compileOnly "curse.maven:journeymap-32274:${journeymap_forge}"
     compileOnly "dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}"
     runtimeOnly "dev.ftb.mods:ftb-library-forge:${ftb_library_version}"
+
+    compileOnly "earth.terrarium.argonauts:argonauts-forge-${minecraft_version}:${argonauts_version}"
+    compileOnly "com.teamresourceful.resourcefullib:resourcefullib-common-${minecraft_version}:${resourceful_lib_version}"
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 

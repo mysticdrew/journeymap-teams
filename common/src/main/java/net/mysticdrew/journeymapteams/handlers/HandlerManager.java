@@ -22,6 +22,7 @@ public enum HandlerManager
     {
         handlerMap.put("minecraft", VanillaTeamsHandler.class);
         handlerMap.put("ftbteams", FTBTeamsHandler.class);
+//        handlerMap.put("argonauts", ArgonautsHandler.class);
     }
 
     /**
