@@ -51,7 +51,7 @@ public class JourneyMapCommonPlugin
 
     public void setPlayerColor(WrappedEntity entity)
     {
-        entity.setColor(handler.getRemotePlayerColor((Player) entity.getEntityLivingRef().get()));
+        entity.setColor(handler.getRemotePlayerIconColor((Player) entity.getEntityLivingRef().get(), entity.getColor()));
     }
 
 }

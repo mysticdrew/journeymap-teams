@@ -38,7 +38,7 @@ public class DrawEntityMixin
             require = 0)
     public void drawVanillaTeamPlayer(PoseStack poseStack, DrawStep.Pass pass, MultiBufferSource buffers, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, double fontScale, double rotation, CallbackInfo ci, LivingEntity living, int labelOffset, Point2D labelPoint)
     {
-        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerColor((Player) living);
+        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerNameColor((Player) living, 16777215);
         DrawUtil.drawBatchLabel(poseStack, this.playerTeamName, buffers, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, color, 1f, fontScale, false, rotation);
         ci.cancel();
     }
@@ -55,7 +55,7 @@ public class DrawEntityMixin
             require = 0)
     public void drawVanillaTeamPlayerSurrogate(PoseStack poseStack, DrawStep.Pass pass, MultiBufferSource buffers, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, double fontScale, double rotation, CallbackInfo ci, LivingEntity living, int labelOffset, Point2D labelPoint)
     {
-        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerColor((Player) living);
+        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerNameColor((Player) living, 16777215);
         DrawUtil.drawBatchLabel(poseStack, this.playerTeamName, buffers, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, color, 1f, fontScale, false, rotation);
         ci.cancel();
     }
@@ -71,7 +71,7 @@ public class DrawEntityMixin
             require = 0)
     public void drawTeamPlayer(PoseStack poseStack, DrawStep.Pass pass, MultiBufferSource buffers, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, double fontScale, double rotation, CallbackInfo ci, LivingEntity living, int labelOffset, Point2D labelPoint)
     {
-        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerColor((Player) living);
+        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerNameColor((Player) living, 65280);
         DrawUtil.drawBatchLabel(poseStack, living.getName(), buffers, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, color, 1f, fontScale, false, rotation);
         ci.cancel();
     }
@@ -88,7 +88,7 @@ public class DrawEntityMixin
             require = 0)
     public void drawTeamPlayerSurrogate(PoseStack poseStack, DrawStep.Pass pass, MultiBufferSource buffers, double drawX, double drawY, GridRenderer gridRenderer, float alpha, double heading, double fontScale, double rotation, CallbackInfo ci, LivingEntity living, int labelOffset, Point2D labelPoint)
     {
-        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerColor((Player) living);
+        int color = JourneyMapTeams.getInstance().getHandler().getRemotePlayerNameColor((Player) living, 65280);
         DrawUtil.drawBatchLabel(poseStack, living.getName(), buffers, labelPoint.getX(), labelPoint.getY(), DrawUtil.HAlign.Center, DrawUtil.VAlign.Below, RGB.BLACK_RGB, .8f, color, 1f, fontScale, false, rotation);
         ci.cancel();
     }

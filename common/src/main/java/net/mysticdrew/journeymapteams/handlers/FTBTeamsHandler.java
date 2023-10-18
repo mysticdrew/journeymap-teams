@@ -4,15 +4,12 @@ import dev.ftb.mods.ftbteams.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.data.ClientTeam;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
-import net.mysticdrew.journeymapteams.handlers.properties.FTBTeamsHandlerProperties;
 
-public class FTBTeamsHandler implements Handler
+public class FTBTeamsHandler extends AbstractHandler
 {
-    private FTBTeamsHandlerProperties properties;
-
     public FTBTeamsHandler()
     {
-        properties = new FTBTeamsHandlerProperties();
+        super("ftbteams", "prop.category.label.ftb");
     }
 
     @Override
@@ -33,8 +30,7 @@ public class FTBTeamsHandler implements Handler
         return visible;
     }
 
-    @Override
-    public int getRemotePlayerColor(Player remotePlayer)
+    protected int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;
         var knownRemotePlayer = FTBTeamsAPI.getClientManager().getKnownPlayer(remotePlayer.getUUID());
@@ -43,15 +39,13 @@ public class FTBTeamsHandler implements Handler
         {
             ClientTeam remoteTeam = FTBTeamsAPI.getClientManager().getTeam(knownRemotePlayer.teamId);
             ClientTeam localTeam = FTBTeamsAPI.getClientManager().getTeam(knownLocalPlayer.teamId);
-
-            var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
-            if (remoteTeam != null
-                    && localTeam != null
-                    && remoteTeam.getId() == localTeam.getId() || allied)
+            if (remoteTeam != null && localTeam != null)
             {
-                return allied && properties.doOverrideAllyColor.get() ? properties.overrideAllyColor.get().getColor() : remoteTeam.getColor();
+                var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
+                var teammates = remoteTeam.getId() == localTeam.getId();
+                return getColor(teammates, allied, remoteTeam.getColor());
             }
         }
-        return properties.defaultTeamColor.get().getColor();
+        return properties.getTeamColor();
     }
 }

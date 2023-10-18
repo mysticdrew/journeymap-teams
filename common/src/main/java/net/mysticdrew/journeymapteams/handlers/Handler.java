@@ -6,5 +6,7 @@ public interface Handler
 {
     boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible);
 
-    int getRemotePlayerColor(Player remotePlayer);
+    int getRemotePlayerNameColor(Player remotePlayer, int currentColor);
+
+    int getRemotePlayerIconColor(Player remotePlayer, int currentColo);
 }

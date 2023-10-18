@@ -2,15 +2,13 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
-import net.mysticdrew.journeymapteams.handlers.properties.VanillaHandlerProperties;
+import net.mysticdrew.journeymapteams.handlers.properties.DefaultHandlerProperties;
 
-public class VanillaTeamsHandler implements Handler
+public class VanillaTeamsHandler extends AbstractHandler
 {
-    private VanillaHandlerProperties properties;
-
     public VanillaTeamsHandler()
     {
-        properties = new VanillaHandlerProperties();
+        super("vanilla", "prop.category.label.vanilla.tooltip");
     }
 
     @Override
@@ -32,8 +30,7 @@ public class VanillaTeamsHandler implements Handler
         return visible;
     }
 
-    @Override
-    public int getRemotePlayerColor(Player remotePlayer)
+    protected int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;
         var localTeam = localPlayer.getTeam();
@@ -42,14 +39,11 @@ public class VanillaTeamsHandler implements Handler
         if (localTeam != null && remoteTeam != null)
         {
             var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
+            var color = remoteTeam.getColor().getColor() != null ? remoteTeam.getColor().getColor() : properties.getTeamColor();
+            return getColor(remoteTeam == localTeam, allied, color);
 
-            if ((remoteTeam == localTeam || allied))
-            {
-                var color = remoteTeam.getColor().getColor() != null ? remoteTeam.getColor().getColor() : properties.defaultTeamColor.get().getColor();
-                return allied && properties.doOverrideAllyColor.get() ? properties.overrideAllyColor.get().getColor() : color;
-            }
         }
-        return properties.defaultTeamColor.get().getColor();
+        return properties.getTeamColor();
     }
 
 }
