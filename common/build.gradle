@@ -16,8 +16,8 @@ minecraft {
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     compileOnly "curse.maven:journeymap-32274:${journeymap_forge}"
-    compileOnly "dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}"
-    runtimeOnly "dev.ftb.mods:ftb-library-forge:${ftb_library_version}"
+    implementation "dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}"
+    implementation "dev.ftb.mods:ftb-library-forge:${ftb_library_version}"
 
     compileOnly "earth.terrarium.argonauts:argonauts-forge-${minecraft_version}:${argonauts_version}"
     compileOnly "com.teamresourceful.resourcefullib:resourcefullib-common-${minecraft_version}:${resourceful_lib_version}"
