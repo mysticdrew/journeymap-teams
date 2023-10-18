@@ -154,6 +154,7 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
     mainFile.displayName = "${archivesBaseName}-${version}"
     mainFile.releaseType = release_type
     mainFile.addModLoader("Forge")
+    mainFile.addModLoader("NeoForge")
     mainFile.addJavaVersion("Java 17")
     mainFile.addGameVersion("${project.minecraft_version}")
     mainFile.changelogType = "html"
@@ -170,7 +171,7 @@ modrinth {
     versionType = release_type
     uploadFile = jar
     gameVersions = ["${project.minecraft_version}"]
-    loaders = ["forge"]
+    loaders = ["forge", "neforge"]
     changelog = file("$project.buildDir/doc/changelog.html").exists() ? file("$project.buildDir/doc/changelog.html").text : null
 }
 
