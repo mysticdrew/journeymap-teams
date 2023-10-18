@@ -1,7 +1,8 @@
 package net.mysticdrew.journeymapteams.handlers;
 
-import dev.ftb.mods.ftbteams.FTBTeamsAPI;
-import dev.ftb.mods.ftbteams.data.ClientTeam;
+import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
+import dev.ftb.mods.ftbteams.api.TeamRank;
+import dev.ftb.mods.ftbteams.api.property.TeamProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -15,13 +16,14 @@ public class FTBTeamsHandler extends AbstractHandler
     @Override
     public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
     {
-        var localTeam = FTBTeamsAPI.getManager().getPlayerTeam(localPlayer.getUUID());
-        var remoteTeam = FTBTeamsAPI.getManager().getPlayerTeam(remotePlayer.getUUID());
-        if (localTeam != null && remoteTeam != null)
+        var localTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(localPlayer.getUUID());
+        var remoteTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(remotePlayer.getUUID());
+        if (localTeam.isPresent() && remoteTeam.isPresent())
         {
-            var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
+            var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
+                    || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
 
-            if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp || (remoteTeam.getType().isPlayer() && !remoteTeam.getType().isParty()))
+            if ((remoteTeam.get().getId() == localTeam.get().getId() || allied) || isOp || (remoteTeam.get().isPlayerTeam() && !remoteTeam.get().isPartyTeam()))
             {
                 return visible;
             }
@@ -33,17 +35,19 @@ public class FTBTeamsHandler extends AbstractHandler
     protected int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;
-        var knownRemotePlayer = FTBTeamsAPI.getClientManager().getKnownPlayer(remotePlayer.getUUID());
-        var knownLocalPlayer = FTBTeamsAPI.getClientManager().getKnownPlayer(localPlayer.getUUID());
-        if (knownRemotePlayer != null && knownLocalPlayer != null)
+        var knownRemotePlayer = FTBTeamsAPI.api().getClientManager().getKnownPlayer(remotePlayer.getUUID());
+        var knownLocalPlayer = FTBTeamsAPI.api().getClientManager().getKnownPlayer(localPlayer.getUUID());
+        if (knownRemotePlayer.isPresent() && knownLocalPlayer.isPresent())
         {
-            ClientTeam remoteTeam = FTBTeamsAPI.getClientManager().getTeam(knownRemotePlayer.teamId);
-            ClientTeam localTeam = FTBTeamsAPI.getClientManager().getTeam(knownLocalPlayer.teamId);
-            if (remoteTeam != null && localTeam != null)
+            var remoteTeam = FTBTeamsAPI.api().getClientManager().getTeamByID(knownRemotePlayer.get().teamId());
+            var localTeam = FTBTeamsAPI.api().getClientManager().getTeamByID(knownLocalPlayer.get().teamId());
+            if (localTeam.isPresent() && remoteTeam.isPresent())
             {
-                var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
-                var teammates = remoteTeam.getId() == localTeam.getId();
-                return getColor(teammates, allied, remoteTeam.getColor());
+                var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
+                        || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
+
+                var teammates = remoteTeam.get().getId() == localTeam.get().getId();
+                return getColor(teammates, allied, remoteTeam.get().getProperty(TeamProperties.COLOR).rgb());
             }
         }
         return properties.getTeamColor();
