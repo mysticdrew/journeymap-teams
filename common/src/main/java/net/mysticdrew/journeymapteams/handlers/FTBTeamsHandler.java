@@ -21,7 +21,7 @@ public class FTBTeamsHandler extends AbstractHandler
         {
             var allied = localTeam.isAlly(remotePlayer.getUUID()) || remoteTeam.isAlly(localPlayer.getUUID());
 
-            if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp)
+            if ((remoteTeam.getId() == localTeam.getId() || allied) || isOp || (remoteTeam.getType().isPlayer() && !remoteTeam.getType().isParty()))
             {
                 return visible;
             }
