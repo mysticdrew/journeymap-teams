@@ -22,6 +22,13 @@ dependencies {
     modCompileOnly("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
         exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
     }
+
+//    modCompileOnly("curse.maven:ftb-teams-fabric-438497:6130783") {
+//        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
+//    }
+//    modCompileOnly("curse.maven:ftb-library-fabric-438495:6164052") {
+//        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
+//    }
     //    modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
 
     // Argonauts deps
