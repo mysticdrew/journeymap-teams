@@ -2,7 +2,6 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
-import net.mysticdrew.journeymapteams.handlers.properties.DefaultHandlerProperties;
 
 public class VanillaTeamsHandler extends AbstractHandler
 {
@@ -25,6 +24,10 @@ public class VanillaTeamsHandler extends AbstractHandler
             {
                 return visible;
             }
+            return false;
+        }
+        else if (localTeam == null && remoteTeam != null && !isOp)
+        {
             return false;
         }
         return visible;

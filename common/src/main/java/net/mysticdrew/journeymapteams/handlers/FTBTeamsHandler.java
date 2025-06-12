@@ -29,6 +29,10 @@ public class FTBTeamsHandler extends AbstractHandler
             }
             return false;
         }
+        else if (localTeam.isEmpty() && remoteTeam.isPresent() && !isOp)
+        {
+            return false;
+        }
         return visible;
     }
 
