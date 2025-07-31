@@ -1,5 +1,6 @@
 package net.mysticdrew.journeymapteams.handlers;
 
+import com.mojang.logging.LogUtils;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.TeamRank;
 import dev.ftb.mods.ftbteams.api.property.TeamProperties;
@@ -23,10 +24,13 @@ public class FTBTeamsHandler extends AbstractHandler
             var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
                     || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
 
-            if ((remoteTeam.get().getId() == localTeam.get().getId() || allied) || isOp || (remoteTeam.get().isPlayerTeam() && !remoteTeam.get().isPartyTeam()))
+            var inPlayerTeam = (remoteTeam.get().isPlayerTeam() && !remoteTeam.get().isPartyTeam());
+            var sameTeam = remoteTeam.get().getTeamId().equals(localTeam.get().getTeamId());
+            if ((sameTeam || allied) || isOp || inPlayerTeam)
             {
                 return visible;
             }
+
             return false;
         }
         else if (localTeam.isEmpty() && remoteTeam.isPresent() && !isOp)
@@ -36,6 +40,7 @@ public class FTBTeamsHandler extends AbstractHandler
         return visible;
     }
 
+    @Override
     protected int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;

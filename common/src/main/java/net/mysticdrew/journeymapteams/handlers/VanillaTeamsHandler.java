@@ -1,5 +1,7 @@
 package net.mysticdrew.journeymapteams.handlers;
 
+import com.mojang.logging.LogUtils;
+import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -20,10 +22,11 @@ public class VanillaTeamsHandler extends AbstractHandler
         {
             var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
 
-            if ((remoteTeam == localTeam || allied) || isOp)
+            if ((remoteTeam.getName().equals(localTeam.getName()) || allied) || isOp)
             {
                 return visible;
             }
+
             return false;
         }
         else if (localTeam == null && remoteTeam != null && !isOp)
@@ -33,6 +36,7 @@ public class VanillaTeamsHandler extends AbstractHandler
         return visible;
     }
 
+    @Override
     protected int getRemotePlayerColor(Player remotePlayer)
     {
         var localPlayer = Minecraft.getInstance().player;

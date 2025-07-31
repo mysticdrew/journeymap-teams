@@ -37,7 +37,8 @@ dependencies {
     modImplementation "eu.pb4:placeholder-api:${placeholder_api_version}"
 
     modImplementation "info.journeymap:journeymap-api:1.19.1-${journeymap_api_version}-fabric-SNAPSHOT"
-
+    modImplementation "dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}"
+    modImplementation "dev.ftb.mods:ftb-library-fabric:${ftb_library_version}"
 
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
