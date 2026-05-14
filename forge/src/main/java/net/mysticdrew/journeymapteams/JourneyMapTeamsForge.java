@@ -12,7 +12,7 @@ public class JourneyMapTeamsForge
     public JourneyMapTeamsForge()
     {
         Set<String> modIds = new HashSet<>();
-        ModList.get().getMods().forEach(m -> modIds.add(m.getModId()));
+        ModList.getMods().forEach(m -> modIds.add(m.getModId()));
         JourneyMapTeams.init(modIds);
     }
 }

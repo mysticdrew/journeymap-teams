@@ -13,7 +13,6 @@ dependencies {
 
     implementation "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
     implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
-    runtimeOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
 // Automated upload to CurseForge for the win!
@@ -45,7 +44,7 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
     mainFile.releaseType = release_type
     mainFile.addModLoader("NeoForge")
-    mainFile.addJavaVersion("Java 21")
+    mainFile.addJavaVersion("Java 25")
     mainFile.addGameVersion("${project.minecraft_version}")
     mainFile.changelogType = "html"
     mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
@@ -66,10 +65,6 @@ modrinth {
 
 neoForge {
     version = neoforge_version
-    parchment {
-        minecraftVersion = mappings_mc_version
-        mappingsVersion = mappings_date
-    }
     runs {
         client {
             client()

@@ -25,10 +25,6 @@ test {
 
 neoForge {
     neoFormVersion = neo_form_version
-    parchment {
-        minecraftVersion = mappings_mc_version
-        mappingsVersion = mappings_date
-    }
     addModdingDependenciesTo(sourceSets.test)
 }
 
@@ -46,7 +42,7 @@ dependencies {
     testImplementation "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
     testImplementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+    testImplementation 'org.mockito:mockito-core:5.20.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.20.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
 }
