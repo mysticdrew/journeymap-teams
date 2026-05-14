@@ -1,6 +1,6 @@
 package net.mysticdrew.journeymapteams.handlers.properties;
 
-import journeymap.client.api.option.KeyedEnum;
+import journeymap.api.v2.client.option.KeyedEnum;
 
 public enum Color implements KeyedEnum
 {

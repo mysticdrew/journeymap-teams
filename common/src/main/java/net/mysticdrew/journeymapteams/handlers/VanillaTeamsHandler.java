@@ -1,32 +1,28 @@
 package net.mysticdrew.journeymapteams.handlers;
 
-import com.mojang.logging.LogUtils;
-import journeymap.common.Journeymap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
+import net.mysticdrew.journeymapteams.handlers.properties.Properties;
 
 public class VanillaTeamsHandler extends AbstractHandler
 {
-    public VanillaTeamsHandler()
+    public VanillaTeamsHandler(Properties properties, LocalPlayerSupplier localPlayerSupplier)
     {
-        super("vanilla", "prop.category.label.vanilla.tooltip");
+        super(properties, localPlayerSupplier);
     }
 
     @Override
-    public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
+    public boolean isVisible(Player receiver, Player remote, boolean isOp, boolean visible)
     {
-        var localTeam = localPlayer.getTeam();
-        var remoteTeam = remotePlayer.getTeam();
+        var localTeam = receiver.getTeam();
+        var remoteTeam = remote.getTeam();
 
         if (localTeam != null && remoteTeam != null)
         {
             var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
-
-            if ((remoteTeam.getName().equals(localTeam.getName()) || allied) || isOp)
+            if (remoteTeam.getName().equals(localTeam.getName()) || allied || isOp)
             {
                 return visible;
             }
-
             return false;
         }
         else if (localTeam == null && remoteTeam != null && !isOp)
@@ -39,18 +35,21 @@ public class VanillaTeamsHandler extends AbstractHandler
     @Override
     protected int getRemotePlayerColor(Player remotePlayer)
     {
-        var localPlayer = Minecraft.getInstance().player;
+        var localPlayer = localPlayerSupplier.get();
+        if (localPlayer == null)
+        {
+            return properties.getTeamColor();
+        }
         var localTeam = localPlayer.getTeam();
         var remoteTeam = remotePlayer.getTeam();
 
         if (localTeam != null && remoteTeam != null)
         {
             var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
-            var color = remoteTeam.getColor().getColor() != null ? remoteTeam.getColor().getColor() : properties.getTeamColor();
-            return getColor(remoteTeam == localTeam, allied, color);
-
+            Integer teamColorValue = remoteTeam.getColor().getColor();
+            int color = teamColorValue != null ? teamColorValue : properties.getTeamColor();
+            return getColor(localTeam == remoteTeam, allied, color);
         }
         return properties.getTeamColor();
     }
-
 }

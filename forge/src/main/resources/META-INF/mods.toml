@@ -24,3 +24,9 @@ mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "journeymap"
+mandatory = true
+versionRange = "${journeymap_version_range}"
+ordering = "AFTER"
+side = "BOTH"

@@ -1,30 +1,17 @@
 package net.mysticdrew.journeymapteams;
 
-import net.mysticdrew.journeymapteams.client.integration.JourneyMapCommonPlugin;
-import net.mysticdrew.journeymapteams.handlers.Handler;
-import net.mysticdrew.journeymapteams.handlers.HandlerManager;
+import java.util.Set;
 
-import java.util.List;
-
-public class JourneyMapTeams
+/**
+ * Common mod bootstrap. Each loader entry point calls {@link #init(Set)} with
+ * the set of loaded mod ids during mod construction.
+ */
+public final class JourneyMapTeams
 {
-    private static JourneyMapTeams instance;
-    private final Handler handler;
+    private JourneyMapTeams() {}
 
-    public JourneyMapTeams(List<String> modIds)
+    public static void init(Set<String> loadedModIds)
     {
-        instance = this;
-        this.handler = HandlerManager.INSTANCE.getHandler(modIds);
-        JourneyMapCommonPlugin.init(this.handler);
-    }
-
-    public static JourneyMapTeams getInstance()
-    {
-        return instance;
-    }
-
-    public Handler getHandler()
-    {
-        return handler;
+        ModEnvironment.setLoadedModIds(loadedModIds);
     }
 }

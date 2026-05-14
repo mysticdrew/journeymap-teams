@@ -8,8 +8,8 @@
     "${mod_author}"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/journeymap-teams",
+    "sources": "https://github.com/mysticdrew/journeymap-ftb-teams"
   },
   "license": "${license}",
   "icon": "icon.png",
@@ -19,19 +19,18 @@
       "net.mysticdrew.journeymapteams.JourneyMapTeamsFabric"
     ],
     "journeymap": [
-      "net.mysticdrew.journeymapteams.client.JourneyMapClientPlugin"
+      "net.mysticdrew.journeymapteams.integration.VanillaTeamsClientPlugin",
+      "net.mysticdrew.journeymapteams.integration.ftb.FtbTeamsClientPlugin"
+    ],
+    "journeymap_server": [
+      "net.mysticdrew.journeymapteams.integration.VanillaTeamsServerPlugin",
+      "net.mysticdrew.journeymapteams.integration.ftb.FtbTeamsServerPlugin"
     ]
   },
-  "mixins": [
-    "${mod_id}.mixins.json"
-  ],
   "depends": {
-    "fabricloader": ">=0.14",
-    "fabric": "*",
-    "minecraft": ">=1.19",
-    "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
+    "fabricloader": ">=0.16",
+    "minecraft": ">=1.21.1",
+    "java": ">=21",
+    "journeymap": ">=${journeymap_min_version}"
   }
 }

@@ -1,118 +1,37 @@
-plugins {
-    id 'java'
-    id 'idea'
-    id 'fabric-loom'
-    id 'net.darkhax.curseforgegradle' version '1.+'
-    id 'com.modrinth.minotaur' version '2.+'
-}
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
-base {
-    archivesName = "${mod_name}-fabric-${minecraft_version}"
+plugins {
+    id 'fabric-loom'
+    id 'multiloader-loader'
+    id 'net.darkhax.curseforgegradle' version '1.1.28'
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-
-    modImplementation "curse.maven:journeymap-32274:${journeymap_fabric}"
-    // FTB Teams Deps
-    modCompileOnly("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
-        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${mappings_mc_version}:${mappings_date}@zip")
     }
-    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
-        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
-    }
-
-//    modCompileOnly("curse.maven:ftb-teams-fabric-438497:6130783") {
-//        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
-//    }
-//    modCompileOnly("curse.maven:ftb-library-fabric-438495:6164052") {
-//        exclude group: 'me.shedaniel', module: 'RoughlyEnoughItems-fabric'
-//    }
-    //    modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
-
-    // Argonauts deps
-    modImplementation "earth.terrarium.argonauts:argonauts-fabric-${minecraft_version}:${argonauts_version}"
-    modImplementation "com.teamresourceful.resourcefullib:resourcefullib-fabric-${minecraft_version}:${resourceful_lib_version}"
-    modImplementation "eu.pb4:placeholder-api:${placeholder_api_version}"
-
-    modImplementation "info.journeymap:journeymap-api:1.19.1-${journeymap_api_version}-fabric-SNAPSHOT"
-    modImplementation "dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}"
-    modImplementation "dev.ftb.mods:ftb-library-fabric:${ftb_library_version}"
 
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    modImplementation group: 'info.journeymap', name: 'journeymap-api-fabric',
+            version: "${journeymap_api_version}", changing: true
+
+    modCompileOnly("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
+        exclude group: 'me.shedaniel'
+    }
+    modCompileOnly("dev.ftb.mods:ftb-library-fabric:${ftb_library_version}") {
+        exclude group: 'me.shedaniel'
+    }
+    modRuntimeOnly "dev.architectury:architectury-fabric:${architectury_version}"
+
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":common")
 }
 
-loom {
-    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
-        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
-    }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
-    runs {
-        client {
-            client()
-            setConfigName("Fabric Client")
-            property("mixin.debug.export", "true")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-        server {
-            server()
-            setConfigName("Fabric Server")
-            property("mixin.debug.export", "true")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-}
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-}
-
-processResources {
-    from project(":common").sourceSets.main.resources
-}
-
-jar {
-    dependsOn 'processDocs'
-    manifest {
-        attributes([
-                "Specification-Title"     : project.name,
-                "Specification-Vendor"    : project.group_id,
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${archiveVersion}",
-                "Implementation-Vendor"   : project.group_id,
-                "Implementation-Timestamp": getDate()
-        ])
-    }
-}
-
-task processDocs(type: Copy) {
-    // update docs
-    from(file("$rootDir/doc/")) {
-        include '*.html'
-        expand 'version': project.version,
-                'date': getDate(),
-                'mcversion': project.minecraft_version,
-                'loaderversion': project.fabric_version,
-                'loadername': "Fabric"
-    }
-    into "$project.buildDir/doc"
-}
-
+// Automated upload to CurseForge for the win!
 if (!project.hasProperty("curseForgeApiKey")) {
     ext.curseForgeApiKey = project.findProperty("curseforge_api_key") ?: "notset"
 }
@@ -120,30 +39,59 @@ if (!project.hasProperty("modrinthApiKey")) {
     ext.modrinthApiKey = project.findProperty("modrinth_api_key") ?: "notset"
 }
 
-task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
-
-    apiToken = "${curseForgeApiKey}"
-    def mainFile = upload(curseforge_project_id, remapJar)
-    mainFile.displayName = "${archivesBaseName}-${version}"
-    mainFile.releaseType = release_type
-    mainFile.addModLoader("Fabric", "Quilt")
-    mainFile.addJavaVersion("Java 17")
-    mainFile.addGameVersion("${project.minecraft_version}")
-    mainFile.changelogType = "html"
-    mainFile.changelog = file("$project.buildDir/doc/changelog.html")
+task processDocs(type: Copy) {
+    from(file("$rootDir/doc/")) {
+        include '*.html'
+        expand 'version': project.version,
+                'date': new Date().format('yyyy-MM-dd'),
+                'mcversion': project.minecraft_version,
+                'loaderversion': project.fabric_loader_version,
+                'loadername': "Fabric"
+    }
+    into layout.buildDirectory.dir("doc")
 }
 
+def publishJar = tasks.named("remapJar")
 
-tasks.modrinth.dependsOn(tasks.build)
+tasks.register("publishCurseForge", TaskPublishCurseForge) {
+    dependsOn processDocs
+    apiToken = "${curseForgeApiKey}"
+    def mainFile = upload(curseforge_project_id, publishJar)
+    mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
+    mainFile.releaseType = release_type
+    mainFile.addModLoader("Fabric", "Quilt")
+    mainFile.addJavaVersion("Java 21")
+    mainFile.addGameVersion("${project.minecraft_version}")
+    mainFile.changelogType = "html"
+    mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
+}
 
 modrinth {
     token = "${modrinthApiKey}"
     projectId = modrinth_project_id
-    versionNumber = "${version}"
-    versionName = "${archivesBaseName}-${version}"
+    versionNumber = "${version}+${project.name}"
+    versionName = "${project.mod_id}-${version}+${project.name}"
     versionType = release_type
-    uploadFile = remapJar
+    uploadFile = publishJar
     gameVersions = ["${project.minecraft_version}"]
     loaders = ["fabric", "quilt"]
-    changelog = file("$project.buildDir/doc/changelog.html").exists() ? file("$project.buildDir/doc/changelog.html").text : null
+    def changelogFile = layout.buildDirectory.dir("doc").get().file("changelog.html").asFile
+    changelog = changelogFile.exists() ? changelogFile.text : null
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run/client")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run/server")
+        }
+    }
 }

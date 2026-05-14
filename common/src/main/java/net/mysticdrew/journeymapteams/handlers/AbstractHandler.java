@@ -1,27 +1,23 @@
 package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.world.entity.player.Player;
-import net.mysticdrew.journeymapteams.handlers.properties.DefaultHandlerProperties;
 import net.mysticdrew.journeymapteams.handlers.properties.Properties;
 
 public abstract class AbstractHandler implements Handler
 {
     protected final Properties properties;
+    protected final LocalPlayerSupplier localPlayerSupplier;
 
-    public AbstractHandler(String categoryToken, String categoryKey)
-    {
-        this.properties = new DefaultHandlerProperties(categoryToken, categoryKey);
-    }
-
-    public AbstractHandler(Properties properties)
+    protected AbstractHandler(Properties properties, LocalPlayerSupplier localPlayerSupplier)
     {
         this.properties = properties;
+        this.localPlayerSupplier = localPlayerSupplier;
     }
 
     @Override
     public int getRemotePlayerNameColor(Player remotePlayer, int currentColor)
     {
-        if (this.properties.getShowNameColor())
+        if (this.properties != null && this.properties.getShowNameColor())
         {
             return getRemotePlayerColor(remotePlayer);
         }
@@ -31,7 +27,7 @@ public abstract class AbstractHandler implements Handler
     @Override
     public int getRemotePlayerIconColor(Player remotePlayer, int currentColor)
     {
-        if (this.properties.getShowIconColor())
+        if (this.properties != null && this.properties.getShowIconColor())
         {
             return getRemotePlayerColor(remotePlayer);
         }
@@ -40,17 +36,19 @@ public abstract class AbstractHandler implements Handler
 
     public int getColor(boolean teammates, boolean allied, int teamColor)
     {
-        if (allied)
-        {
-            return properties.getForceAllyColor() ? properties.getAllyColor() : teamColor;
-        }
-
         if (teammates)
         {
             return properties.getForceTeamColor() ? properties.getTeamColor() : teamColor;
         }
-        return properties.getTeamColor();
+        if (allied)
+        {
+            return properties.getForceAllyColor() ? properties.getAllyColor() : teamColor;
+        }
+        return teamColor;
     }
 
+    /**
+     * Client-side color resolution; uses {@link #localPlayerSupplier}.
+     */
     protected abstract int getRemotePlayerColor(Player remotePlayer);
 }

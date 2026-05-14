@@ -4,9 +4,18 @@ import net.minecraft.world.entity.player.Player;
 
 public interface Handler
 {
-    boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible);
+    /**
+     * Server-side: decide radar visibility of {@code remote} for {@code receiver}.
+     */
+    boolean isVisible(Player receiver, Player remote, boolean isOp, boolean visible);
 
+    /**
+     * Client-side: team-name label / fallback color for a tracked player.
+     */
     int getRemotePlayerNameColor(Player remotePlayer, int currentColor);
 
-    int getRemotePlayerIconColor(Player remotePlayer, int currentColo);
+    /**
+     * Client-side: icon/dot color for a tracked player.
+     */
+    int getRemotePlayerIconColor(Player remotePlayer, int currentColor);
 }

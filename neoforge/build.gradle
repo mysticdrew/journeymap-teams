@@ -1,31 +1,19 @@
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
+    id 'net.neoforged.moddev'
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[7.0.2,8.0)'
     id 'net.darkhax.curseforgegradle' version '1.1.28'
     id "com.modrinth.minotaur" version "2.+"
 }
 
-repositories {
-    maven minecraft.mavenizer
-    maven fg.forgeMaven
-    maven fg.minecraftLibsMaven
-    mavenCentral()
-}
-
 dependencies {
-    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
-
-    implementation group: 'info.journeymap', name: 'journeymap-api-forge',
+    implementation group: 'info.journeymap', name: 'journeymap-api-neoforge',
             version: "${journeymap_api_version}", changing: true
 
-    // FTB Teams/Library have no Forge variant for MC 1.21.1 (Forge support was dropped
-    // by FTB after MC 1.20.x in favour of NeoForge).  We use the NeoForge jars as
-    // compile-only stubs: the public API surface (dev.ftb.mods.ftbteams.api.*) is
-    // loader-agnostic so the common sources compile successfully against them.
-    compileOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
-    compileOnly "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    implementation "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
+    implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    runtimeOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
 // Automated upload to CurseForge for the win!
@@ -42,8 +30,8 @@ task processDocs(type: Copy) {
         expand 'version': project.version,
                 'date': new Date().format('yyyy-MM-dd'),
                 'mcversion': project.minecraft_version,
-                'loaderversion': project.forge_version,
-                'loadername': "Forge"
+                'loaderversion': project.neoforge_version,
+                'loadername': "NeoForge"
     }
     into layout.buildDirectory.dir("doc")
 }
@@ -56,7 +44,7 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     def mainFile = upload(curseforge_project_id, publishJar)
     mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
     mainFile.releaseType = release_type
-    mainFile.addModLoader("Forge")
+    mainFile.addModLoader("NeoForge")
     mainFile.addJavaVersion("Java 21")
     mainFile.addGameVersion("${project.minecraft_version}")
     mainFile.changelogType = "html"
@@ -71,32 +59,32 @@ modrinth {
     versionType = release_type
     uploadFile = publishJar
     gameVersions = ["${project.minecraft_version}"]
-    loaders = ["forge"]
+    loaders = ["neoforge"]
     def changelogFile = layout.buildDirectory.dir("doc").get().file("changelog.html").asFile
     changelog = changelogFile.exists() ? changelogFile.text : null
 }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
-
+neoForge {
+    version = neoforge_version
+    parchment {
+        minecraftVersion = mappings_mc_version
+        mappingsVersion = mappings_date
+    }
     runs {
         client {
-            workingDir = project.file('run/client')
-            client = true
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            client()
+            gameDirectory = project.file('run/client')
+            programArgument '--username=TeamCaptDev'
         }
         server {
-            workingDir = project.file('run/server')
-            client = false
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+            server()
+            gameDirectory = project.file('run/server')
+            programArgument '--nogui'
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
         }
     }
 }
