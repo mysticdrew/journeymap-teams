@@ -16,6 +16,9 @@ dependencies {
     implementation group: 'info.journeymap', name: 'journeymap-api-fabric',
             version: "${journeymap_api_version}", changing: true
 
+    compileOnly group: 'mysticdrew', name: 'common-networking-fabric',
+            version: "${common_networking_version}-${common_networking_mc_version}", changing: true
+
     compileOnly("dev.ftb.mods:ftb-teams-fabric:${ftb_teams_version}") {
         exclude group: 'me.shedaniel'
     }

@@ -9,6 +9,7 @@ import net.mysticdrew.journeymapteams.Constants;
 import net.mysticdrew.journeymapteams.ModEnvironment;
 import net.mysticdrew.journeymapteams.handlers.VanillaTeamsHandler;
 import net.mysticdrew.journeymapteams.handlers.properties.DefaultHandlerProperties;
+import net.mysticdrew.journeymapteams.integration.betterteams.BetterTeamsCache;
 
 @JourneyMapPlugin(apiVersion = "2.0.0")
 public class VanillaTeamsClientPlugin implements IClientPlugin
@@ -28,8 +29,15 @@ public class VanillaTeamsClientPlugin implements IClientPlugin
                 () -> Minecraft.getInstance().player);
         this.colorApplier = new RadarColorApplier(handler, RadarColorApplier.NameMode.VANILLA_TEAM);
 
-        ClientEventRegistry.ENTITY_RADAR_UPDATE_EVENT.subscribe(Constants.MOD_ID,
-                colorApplier::onEntityRadarUpdate);
+        ClientEventRegistry.ENTITY_RADAR_UPDATE_EVENT.subscribe(Constants.MOD_ID, evt ->
+        {
+            // BT-on-Paper supersedes vanilla team coloring once the server has pushed a snapshot.
+            if (BetterTeamsCache.isActive())
+            {
+                return;
+            }
+            colorApplier.onEntityRadarUpdate(evt);
+        });
     }
 
     @Override

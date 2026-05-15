@@ -23,6 +23,8 @@
   "prop.category.label.ftb.server.tooltip": "Server-side visibility options for FTB Teams integration.",
   "prop.category.label.vanilla.server": "JourneyMap Vanilla Teams",
   "prop.category.label.vanilla.server.tooltip": "Server-side visibility options for Vanilla Teams integration.",
+  "prop.category.label.betterteams.server": "JourneyMap BetterTeams",
+  "prop.category.label.betterteams.server.tooltip": "Server-side visibility options for BetterTeams integration.",
   "prop.option.label.team_color": "Team Color",
   "prop.option.label.team_color.tooltip": "This is used when forcing team color, or if there is a failure getting the color from the team.",
   "prop.option.label.ally_color": "Ally Color",

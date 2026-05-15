@@ -11,6 +11,7 @@ plugins {
 
 repositories {
     maven { name = 'PaperMC'; url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { name = 'JitPack'; url = 'https://jitpack.io' }
 }
 
 // NeoForm gives compile-time access to vanilla MC including client classes that
@@ -24,6 +25,11 @@ dependencies {
 
     compileOnly group: 'info.journeymap', name: 'journeymap-api-paper',
             version: "${journeymap_api_version}", changing: true
+
+    compileOnly group: 'mysticdrew', name: 'common-networking-common',
+            version: "${common_networking_version}-${common_networking_mc_version}", changing: true
+
+    compileOnly "com.github.booksaw:BetterTeams:${better_teams_version}"
 }
 
 if (!project.hasProperty("curseForgeApiKey")) {

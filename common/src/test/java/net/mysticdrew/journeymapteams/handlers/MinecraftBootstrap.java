@@ -8,13 +8,13 @@ import net.minecraft.server.Bootstrap;
  * Call {@link #boot()} in a {@code @BeforeAll} on every test class that
  * uses real (or Mockito-mocked) Minecraft types.
  */
-final class MinecraftBootstrap
+public final class MinecraftBootstrap
 {
     private static volatile boolean booted = false;
 
     private MinecraftBootstrap() {}
 
-    static synchronized void boot()
+    public static synchronized void boot()
     {
         if (!booted)
         {

@@ -18,6 +18,9 @@
     "main": [
       "net.mysticdrew.journeymapteams.JourneyMapTeamsFabric"
     ],
+    "client": [
+      "net.mysticdrew.journeymapteams.JourneyMapTeamsFabricClient"
+    ],
     "journeymap": [
       "net.mysticdrew.journeymapteams.integration.VanillaTeamsClientPlugin",
       "net.mysticdrew.journeymapteams.integration.ftb.FtbTeamsClientPlugin"
