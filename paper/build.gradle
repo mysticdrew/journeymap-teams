@@ -2,51 +2,30 @@ import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
     id 'multiloader-loader'
-    id 'net.minecraftforge.gradle' version '[7.0.11,8.0)'
+    id 'net.neoforged.moddev'
+    id 'io.papermc.paperweight.userdev' version "${paperweight_userdev_version}"
+    id 'xyz.jpenilla.run-paper' version "${run_paper_version}"
     id 'net.darkhax.curseforgegradle' version '1.1.28'
     id "com.modrinth.minotaur" version "2.+"
 }
 
 repositories {
-    maven minecraft.mavenizer
-    maven fg.forgeMaven
-    maven fg.minecraftLibsMaven
-    mavenCentral()
+    maven { name = 'PaperMC'; url = 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+// NeoForm gives compile-time access to vanilla MC including client classes that
+// common references. At runtime these classes never load on Paper.
+neoForge {
+    neoFormVersion = neo_form_version
 }
 
 dependencies {
-    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    paperweight.paperDevBundle("${paper_version}")
 
-    implementation group: 'info.journeymap', name: 'journeymap-api-forge',
+    compileOnly group: 'info.journeymap', name: 'journeymap-api-paper',
             version: "${journeymap_api_version}", changing: true
 }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
-
-    runs {
-        client {
-            workingDir = project.file('run/client')
-            client = true
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-        server {
-            workingDir = project.file('run/server')
-            client = false
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-// Automated upload to CurseForge for the win!
 if (!project.hasProperty("curseForgeApiKey")) {
     ext.curseForgeApiKey = project.findProperty("curseforge_api_key") ?: "notset"
 }
@@ -60,8 +39,8 @@ task processDocs(type: Copy) {
         expand 'version': project.version,
                 'date': new Date().format('yyyy-MM-dd'),
                 'mcversion': project.minecraft_version,
-                'loaderversion': project.forge_version,
-                'loadername': "Forge"
+                'loaderversion': project.paper_version,
+                'loadername': "Paper"
     }
     into layout.buildDirectory.dir("doc")
 }
@@ -74,7 +53,7 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     def mainFile = upload(curseforge_project_id, publishJar)
     mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
     mainFile.releaseType = release_type
-    mainFile.addModLoader("Forge")
+    // No addModLoader: CurseForge does not list Paper/Bukkit as a mod loader.
     mainFile.addJavaVersion("Java 25")
     mainFile.addGameVersion("${project.minecraft_version}")
     mainFile.addRelation("journeymap", "requiredDependency")
@@ -90,7 +69,7 @@ modrinth {
     versionType = release_type
     uploadFile = publishJar
     gameVersions = ["${project.minecraft_version}"]
-    loaders = ["forge"]
+    loaders = ["paper"]
     def changelogFile = layout.buildDirectory.dir("doc").get().file("changelog.html").asFile
     changelog = changelogFile.exists() ? changelogFile.text : null
     dependencies {

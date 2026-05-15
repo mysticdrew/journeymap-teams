@@ -7,6 +7,7 @@ import journeymap.api.v2.server.IServerPlugin;
 import journeymap.api.v2.server.event.PlayerRadarUpdateEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.mysticdrew.journeymapteams.Constants;
+import net.mysticdrew.journeymapteams.ModEnvironment;
 import net.mysticdrew.journeymapteams.handlers.properties.DefaultServerProperties;
 
 @JourneyMapPlugin(apiVersion = "2.0.0", dependencies = {"ftbteams"})
@@ -17,6 +18,10 @@ public class FtbTeamsServerPlugin implements IServerPlugin
     @Override
     public void initialize(IServerAPI jmServerApi)
     {
+        if (!ModEnvironment.isLoaded("ftbteams"))
+        {
+            return;
+        }
         ServerEventRegistry.OPTIONS_REGISTRY_EVENT.subscribe(Constants.MOD_ID, event -> {
             DefaultServerProperties serverProperties =
                     new DefaultServerProperties("ftbteams", "prop.category.label.ftb.server");

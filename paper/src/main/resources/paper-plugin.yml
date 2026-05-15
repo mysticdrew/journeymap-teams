@@ -1,0 +1,13 @@
+name: ${mod_id}
+version: ${version}
+main: net.mysticdrew.journeymapteams.JourneyMapTeamsPaper
+api-version: '1.21'
+authors: [ ${mod_author} ]
+description: ${description}
+website: https://www.curseforge.com/minecraft/mc-mods/journeymapteams
+dependencies:
+  server:
+    journeymap:
+      load: BEFORE
+      required: true
+      join-classpath: true
