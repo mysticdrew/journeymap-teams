@@ -9,11 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.mysticdrew.journeymapteams.Constants;
 import net.mysticdrew.journeymapteams.ModEnvironment;
 import net.mysticdrew.journeymapteams.handlers.VanillaTeamsHandler;
+import net.mysticdrew.journeymapteams.handlers.properties.DefaultServerProperties;
 
 @JourneyMapPlugin(apiVersion = "2.0.0")
 public class VanillaTeamsServerPlugin implements IServerPlugin
 {
-    private final VanillaTeamsHandler handler = new VanillaTeamsHandler(null, () -> null);
+    private VanillaTeamsHandler handler;
 
     @Override
     public void initialize(IServerAPI jmServerApi)
@@ -22,12 +23,17 @@ public class VanillaTeamsServerPlugin implements IServerPlugin
         {
             return; // self-disable in favor of a dedicated teams mod
         }
+        ServerEventRegistry.OPTIONS_REGISTRY_EVENT.subscribe(Constants.MOD_ID, event -> {
+            DefaultServerProperties serverProperties =
+                    new DefaultServerProperties("vanilla", "prop.category.label.vanilla.server");
+            this.handler = new VanillaTeamsHandler(null, serverProperties, () -> null);
+        });
         ServerEventRegistry.PLAYER_RADAR_UPDATE_EVENT.subscribe(Constants.MOD_ID, this::onPlayerRadarUpdate);
     }
 
     private void onPlayerRadarUpdate(PlayerRadarUpdateEvent event)
     {
-        if (event.getAction() != PlayerRadarUpdateEvent.Action.UPDATE)
+        if (handler == null || event.getAction() != PlayerRadarUpdateEvent.Action.UPDATE)
         {
             return;
         }

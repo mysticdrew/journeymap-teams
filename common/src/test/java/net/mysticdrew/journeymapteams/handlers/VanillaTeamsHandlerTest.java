@@ -2,6 +2,7 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
+import net.mysticdrew.journeymapteams.handlers.properties.ServerProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,23 @@ class VanillaTeamsHandlerTest
         MinecraftBootstrap.boot();
     }
 
-    private final VanillaTeamsHandler handler = new VanillaTeamsHandler(null, () -> null);
+    /** A ServerProperties mock whose values reproduce the historical hardcoded behavior. */
+    private static ServerProperties defaults()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getOpsBypassHiding()).thenReturn(true);
+        when(sp.getHideUnteamed()).thenReturn(false);
+        when(sp.getHideAllies()).thenReturn(false);
+        when(sp.getHideOtherTeams()).thenReturn(true);
+        when(sp.getHideTeamedFromUnteamed()).thenReturn(true);
+        return sp;
+    }
+
+    private static VanillaTeamsHandler handlerWith(ServerProperties sp)
+    {
+        return new VanillaTeamsHandler(null, sp, () -> null);
+    }
 
     @Test
     void isVisible_sameTeam_returnsVisibleArg()
@@ -29,6 +46,7 @@ class VanillaTeamsHandlerTest
         Player remote = mock(Player.class);
         when(receiver.getTeam()).thenReturn(team);
         when(remote.getTeam()).thenReturn(team);
+        VanillaTeamsHandler handler = handlerWith(defaults());
         assertTrue(handler.isVisible(receiver, remote, false, true));
         assertFalse(handler.isVisible(receiver, remote, false, false));
     }
@@ -44,7 +62,7 @@ class VanillaTeamsHandlerTest
         Player remote = mock(Player.class);
         when(receiver.getTeam()).thenReturn(red);
         when(remote.getTeam()).thenReturn(blue);
-        assertFalse(handler.isVisible(receiver, remote, false, true));
+        assertFalse(handlerWith(defaults()).isVisible(receiver, remote, false, true));
     }
 
     @Test
@@ -55,7 +73,7 @@ class VanillaTeamsHandlerTest
         Player remote = mock(Player.class);
         when(receiver.getTeam()).thenReturn(null);
         when(remote.getTeam()).thenReturn(blue);
-        assertFalse(handler.isVisible(receiver, remote, false, true));
+        assertFalse(handlerWith(defaults()).isVisible(receiver, remote, false, true));
     }
 
     @Test
@@ -66,6 +84,23 @@ class VanillaTeamsHandlerTest
         Player remote = mock(Player.class);
         when(receiver.getTeam()).thenReturn(null);
         when(remote.getTeam()).thenReturn(blue);
-        assertTrue(handler.isVisible(receiver, remote, true, true));
+        assertTrue(handlerWith(defaults()).isVisible(receiver, remote, true, true));
+    }
+
+    @Test
+    void isVisible_differentTeam_hideOtherTeamsFalse_returnsVisibleArg()
+    {
+        PlayerTeam red = mock(PlayerTeam.class);
+        when(red.getName()).thenReturn("red");
+        PlayerTeam blue = mock(PlayerTeam.class);
+        when(blue.getName()).thenReturn("blue");
+        Player receiver = mock(Player.class);
+        Player remote = mock(Player.class);
+        when(receiver.getTeam()).thenReturn(red);
+        when(remote.getTeam()).thenReturn(blue);
+
+        ServerProperties sp = defaults();
+        when(sp.getHideOtherTeams()).thenReturn(false);
+        assertTrue(handlerWith(sp).isVisible(receiver, remote, false, true));
     }
 }

@@ -2,34 +2,44 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.world.entity.player.Player;
 import net.mysticdrew.journeymapteams.handlers.properties.Properties;
+import net.mysticdrew.journeymapteams.handlers.properties.ServerProperties;
 
 public class VanillaTeamsHandler extends AbstractHandler
 {
-    public VanillaTeamsHandler(Properties properties, LocalPlayerSupplier localPlayerSupplier)
+    public VanillaTeamsHandler(Properties properties, ServerProperties serverProperties,
+                               LocalPlayerSupplier localPlayerSupplier)
     {
-        super(properties, localPlayerSupplier);
+        super(properties, serverProperties, localPlayerSupplier);
     }
 
     @Override
     public boolean isVisible(Player receiver, Player remote, boolean isOp, boolean visible)
     {
+        return applyVisibilityPolicy(relationship(receiver, remote), isOp, visible);
+    }
+
+    private VisibilityRelationship relationship(Player receiver, Player remote)
+    {
         var localTeam = receiver.getTeam();
         var remoteTeam = remote.getTeam();
 
-        if (localTeam != null && remoteTeam != null)
+        if (remoteTeam == null)
         {
-            var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
-            if (remoteTeam.getName().equals(localTeam.getName()) || allied || isOp)
-            {
-                return visible;
-            }
-            return false;
+            return VisibilityRelationship.REMOTE_UNTEAMED;
         }
-        else if (localTeam == null && remoteTeam != null && !isOp)
+        if (localTeam == null)
         {
-            return false;
+            return VisibilityRelationship.VIEWER_UNTEAMED_REMOTE_TEAMED;
         }
-        return visible;
+        if (remoteTeam.getName().equals(localTeam.getName()))
+        {
+            return VisibilityRelationship.SAME_TEAM;
+        }
+        if (localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam))
+        {
+            return VisibilityRelationship.ALLIED;
+        }
+        return VisibilityRelationship.OTHER_TEAM;
     }
 
     @Override

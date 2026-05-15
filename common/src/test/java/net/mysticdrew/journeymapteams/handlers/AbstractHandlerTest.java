@@ -2,10 +2,13 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.world.entity.player.Player;
 import net.mysticdrew.journeymapteams.handlers.properties.Properties;
+import net.mysticdrew.journeymapteams.handlers.properties.ServerProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +22,7 @@ class AbstractHandlerTest
 
     private static AbstractHandler handlerWith(Properties props)
     {
-        return new AbstractHandler(props, () -> null)
+        return new AbstractHandler(props, null, () -> null)
         {
             @Override
             public boolean isVisible(Player r, Player rm, boolean op, boolean vis) { return vis; }
@@ -72,5 +75,116 @@ class AbstractHandlerTest
         Properties props = mock(Properties.class);
         when(props.getShowNameColor()).thenReturn(false);
         assertEquals(0x999999, handlerWith(props).getRemotePlayerNameColor(mock(Player.class), 0x999999));
+    }
+
+    private static AbstractHandler handlerWithServer(ServerProperties sp)
+    {
+        return new AbstractHandler(null, sp, () -> null)
+        {
+            @Override
+            public boolean isVisible(Player r, Player rm, boolean op, boolean vis) { return vis; }
+            @Override
+            protected int getRemotePlayerColor(Player p) { return 0xAAAAAA; }
+        };
+    }
+
+    @Test
+    void applyVisibilityPolicy_nullServerProperties_returnsVisibleArg()
+    {
+        AbstractHandler h = handlerWithServer(null);
+        assertTrue(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, false, true));
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, false, false));
+    }
+
+    @Test
+    void applyVisibilityPolicy_masterOff_returnsVisibleArg()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(false);
+        AbstractHandler h = handlerWithServer(sp);
+        assertTrue(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, false, true));
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, false, false));
+    }
+
+    @Test
+    void applyVisibilityPolicy_opsBypassOn_opSeesEveryone()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getOpsBypassHiding()).thenReturn(true);
+        when(sp.getHideOtherTeams()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertTrue(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, true, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_opsBypassOff_opStillHidden()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getOpsBypassHiding()).thenReturn(false);
+        when(sp.getHideOtherTeams()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, true, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_sameTeam_alwaysVisible()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertTrue(h.applyVisibilityPolicy(VisibilityRelationship.SAME_TEAM, false, true));
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.SAME_TEAM, false, false));
+    }
+
+    @Test
+    void applyVisibilityPolicy_remoteUnteamed_hiddenWhenHideUnteamedTrue()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getHideUnteamed()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.REMOTE_UNTEAMED, false, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_remoteUnteamed_shownWhenHideUnteamedFalse()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getHideUnteamed()).thenReturn(false);
+        AbstractHandler h = handlerWithServer(sp);
+        assertTrue(h.applyVisibilityPolicy(VisibilityRelationship.REMOTE_UNTEAMED, false, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_allied_hiddenWhenHideAlliesTrue()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getHideAllies()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.ALLIED, false, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_otherTeam_hiddenWhenHideOtherTeamsTrue()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getHideOtherTeams()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.OTHER_TEAM, false, true));
+    }
+
+    @Test
+    void applyVisibilityPolicy_viewerUnteamedRemoteTeamed_hiddenWhenHideTeamedFromUnteamedTrue()
+    {
+        ServerProperties sp = mock(ServerProperties.class);
+        when(sp.getEnforceTeamVisibility()).thenReturn(true);
+        when(sp.getHideTeamedFromUnteamed()).thenReturn(true);
+        AbstractHandler h = handlerWithServer(sp);
+        assertFalse(h.applyVisibilityPolicy(VisibilityRelationship.VIEWER_UNTEAMED_REMOTE_TEAMED, false, true));
     }
 }

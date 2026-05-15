@@ -24,7 +24,7 @@ public class VanillaTeamsClientPlugin implements IClientPlugin
             return; // self-disable
         }
         this.properties = new DefaultHandlerProperties("vanilla", "prop.category.label.vanilla");
-        VanillaTeamsHandler handler = new VanillaTeamsHandler(properties,
+        VanillaTeamsHandler handler = new VanillaTeamsHandler(properties, null,
                 () -> Minecraft.getInstance().player);
         this.colorApplier = new RadarColorApplier(handler, RadarColorApplier.NameMode.VANILLA_TEAM);
 
