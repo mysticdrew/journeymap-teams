@@ -16,6 +16,31 @@ dependencies {
     runtimeOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 }
 
+neoForge {
+    version = neoforge_version
+    parchment {
+        minecraftVersion = mappings_mc_version
+        mappingsVersion = mappings_date
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('run/client')
+            programArgument '--username=TeamCaptDev'
+        }
+        server {
+            server()
+            gameDirectory = project.file('run/server')
+            programArgument '--nogui'
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
 // Automated upload to CurseForge for the win!
 if (!project.hasProperty("curseForgeApiKey")) {
     ext.curseForgeApiKey = project.findProperty("curseforge_api_key") ?: "notset"
@@ -47,6 +72,7 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     mainFile.addModLoader("NeoForge")
     mainFile.addJavaVersion("Java 21")
     mainFile.addGameVersion("${project.minecraft_version}")
+    mainFile.addRelation("journeymap", "requiredDependency")
     mainFile.changelogType = "html"
     mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
 }
@@ -62,29 +88,7 @@ modrinth {
     loaders = ["neoforge"]
     def changelogFile = layout.buildDirectory.dir("doc").get().file("changelog.html").asFile
     changelog = changelogFile.exists() ? changelogFile.text : null
-}
-
-neoForge {
-    version = neoforge_version
-    parchment {
-        minecraftVersion = mappings_mc_version
-        mappingsVersion = mappings_date
-    }
-    runs {
-        client {
-            client()
-            gameDirectory = project.file('run/client')
-            programArgument '--username=TeamCaptDev'
-        }
-        server {
-            server()
-            gameDirectory = project.file('run/server')
-            programArgument '--nogui'
-        }
-    }
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
-        }
+    dependencies {
+        required.project "journeymap"
     }
 }
