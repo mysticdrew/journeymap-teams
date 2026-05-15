@@ -22,7 +22,7 @@ public class FtbTeamsClientPlugin implements IClientPlugin
         try
         {
             this.properties = new DefaultHandlerProperties("ftbteams", "prop.category.label.ftb");
-            FTBTeamsHandler handler = new FTBTeamsHandler(properties, () -> Minecraft.getInstance().player);
+            FTBTeamsHandler handler = new FTBTeamsHandler(properties, null, () -> Minecraft.getInstance().player);
             this.colorApplier = new RadarColorApplier(handler, RadarColorApplier.NameMode.CUSTOM_NAME);
 
             ClientEventRegistry.ENTITY_RADAR_UPDATE_EVENT.subscribe(Constants.MOD_ID,

@@ -1,43 +1,61 @@
 package net.mysticdrew.journeymapteams.integration.ftb;
 
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
+import dev.ftb.mods.ftbteams.api.Team;
 import dev.ftb.mods.ftbteams.api.TeamRank;
 import dev.ftb.mods.ftbteams.api.property.TeamProperties;
 import net.minecraft.world.entity.player.Player;
 import net.mysticdrew.journeymapteams.handlers.AbstractHandler;
 import net.mysticdrew.journeymapteams.handlers.LocalPlayerSupplier;
+import net.mysticdrew.journeymapteams.handlers.VisibilityRelationship;
 import net.mysticdrew.journeymapteams.handlers.properties.Properties;
+import net.mysticdrew.journeymapteams.handlers.properties.ServerProperties;
+
+import java.util.Optional;
 
 public class FTBTeamsHandler extends AbstractHandler
 {
-    public FTBTeamsHandler(Properties properties, LocalPlayerSupplier localPlayerSupplier)
+    public FTBTeamsHandler(Properties properties, ServerProperties serverProperties,
+                           LocalPlayerSupplier localPlayerSupplier)
     {
-        super(properties, localPlayerSupplier);
+        super(properties, serverProperties, localPlayerSupplier);
     }
 
     @Override
     public boolean isVisible(Player receiver, Player remote, boolean isOp, boolean visible)
     {
+        return applyVisibilityPolicy(relationship(receiver, remote), isOp, visible);
+    }
+
+    private VisibilityRelationship relationship(Player receiver, Player remote)
+    {
         var localTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(receiver.getUUID());
         var remoteTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(remote.getUUID());
-        if (localTeam.isPresent() && remoteTeam.isPresent())
-        {
-            var allied = localTeam.get().getRankForPlayer(remote.getUUID()).isAtLeast(TeamRank.ALLY)
-                    || remoteTeam.get().getRankForPlayer(receiver.getUUID()).isAtLeast(TeamRank.ALLY);
 
-            var inPlayerTeam = remoteTeam.get().isPlayerTeam() && !remoteTeam.get().isPartyTeam();
-            var sameTeam = remoteTeam.get().getTeamId().equals(localTeam.get().getTeamId());
-            if (sameTeam || allied || isOp || inPlayerTeam)
-            {
-                return visible;
-            }
-            return false;
-        }
-        else if (localTeam.isEmpty() && remoteTeam.isPresent() && !isOp)
+        if (isUnteamed(remoteTeam))
         {
-            return false;
+            return VisibilityRelationship.REMOTE_UNTEAMED;
         }
-        return visible;
+        if (isUnteamed(localTeam))
+        {
+            return VisibilityRelationship.VIEWER_UNTEAMED_REMOTE_TEAMED;
+        }
+        if (remoteTeam.get().getTeamId().equals(localTeam.get().getTeamId()))
+        {
+            return VisibilityRelationship.SAME_TEAM;
+        }
+        boolean allied = localTeam.get().getRankForPlayer(remote.getUUID()).isAtLeast(TeamRank.ALLY)
+                || remoteTeam.get().getRankForPlayer(receiver.getUUID()).isAtLeast(TeamRank.ALLY);
+        return allied ? VisibilityRelationship.ALLIED : VisibilityRelationship.OTHER_TEAM;
+    }
+
+    /**
+     * In FTB every logged-in player has a team, so "unteamed" means the player
+     * is in their own auto-created player team rather than a party team.
+     */
+    private static boolean isUnteamed(Optional<Team> team)
+    {
+        return team.isEmpty() || (team.get().isPlayerTeam() && !team.get().isPartyTeam());
     }
 
     @Override
