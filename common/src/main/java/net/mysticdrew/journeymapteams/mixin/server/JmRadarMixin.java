@@ -2,91 +2,71 @@ package net.mysticdrew.journeymapteams.mixin.server;
 
 import journeymap.common.Journeymap;
 import journeymap.common.events.ServerEventHandler;
-import journeymap.common.properties.GlobalProperties;
+import journeymap.common.network.dispatch.NetworkDispatcher;
 import net.minecraft.server.level.ServerPlayer;
 import net.mysticdrew.journeymapteams.JourneyMapTeams;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Surrogate;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
+/**
+ * Hands the per-player {@code visible} flag through our handler so team-based
+ * hiding actually applies on the server. JM 5.10 has no server event, so we
+ * redirect its own per-player {@code sendPlayerLocationPacket} call to swap
+ * the boolean argument before JM dispatches it.
+ *
+ * <p>This used to be an {@code @Inject(cancellable = true) + ci.cancel()} that
+ * captured locals. Two bugs in that approach:
+ * <ul>
+ *   <li>{@code ci.cancel()} returns from {@code sendPlayerTrackingData}, not
+ *       from the for-loop iteration, so on JM 5.10 (which sends a packet per
+ *       player inside the loop) every receiver only ever processed the first
+ *       non-self radar player and silently skipped everyone else.</li>
+ *   <li>The extra "enclosing method args" added to the redirect handler in a
+ *       previous attempt are not legal for SpongePowered {@code @Redirect};
+ *       the handler signature must match the redirected call exactly, so any
+ *       extra parameters cause the redirect to silently fail to apply when
+ *       {@code require = 0}.</li>
+ * </ul>
+ * Mirrors what {@code PlayerRadarUpdateEvent} does in journeymap-6: mutate the
+ * visibility decision and let JM's own dispatch path proceed.
+ */
 @Mixin(value = ServerEventHandler.class, remap = false)
 public class JmRadarMixin
 {
-    @Inject(method = "sendPlayerTrackingData(Lnet/minecraft/server/level/ServerPlayer;Z)V",
+    @Redirect(
+            method = "sendPlayerTrackingData(Lnet/minecraft/server/level/ServerPlayer;Z)V",
             at = @At(value = "INVOKE",
-                    target = "Ljourneymap/common/network/dispatch/NetworkDispatcher;sendPlayerLocationPacket(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerPlayer;Z)V",
-                    shift = At.Shift.BEFORE),
-            cancellable = true,
-            locals = LocalCapture.CAPTURE_FAILSOFT,
+                    target = "Ljourneymap/common/network/dispatch/NetworkDispatcher;sendPlayerLocationPacket(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerPlayer;Z)V"),
             require = 0
     )
-    public void sendPlayerTrackingData(ServerPlayer entityPlayerMP,
-                                       boolean receiverOp,
-                                       CallbackInfo ci,
-                                       List serverPlayers,
-                                       GlobalProperties properties,
-                                       Iterator var5,
-                                       ServerPlayer radarPlayer,
-                                       boolean sameDimension,
-                                       boolean sneaking,
-                                       boolean invisible,
-                                       boolean hideOp,
-                                       boolean hideSpectators,
-                                       boolean seeUnderground,
-                                       boolean visible,
-                                       UUID playerId)
+    private void journeymapTeams$filterVisibility(NetworkDispatcher dispatcher,
+                                                  ServerPlayer receiver,
+                                                  ServerPlayer radarPlayer,
+                                                  boolean visible)
     {
-        boolean display = JourneyMapTeams.getInstance().getHandler().isVisible(entityPlayerMP, radarPlayer, receiverOp, visible);
-        Journeymap.getInstance().getDispatcher().sendPlayerLocationPacket(entityPlayerMP, radarPlayer, display);
-        ci.cancel();
+        boolean receiverOp = Journeymap.isOp(receiver);
+        boolean display = JourneyMapTeams.getInstance()
+                .getHandler()
+                .isVisible(receiver, radarPlayer, receiverOp, visible);
+        dispatcher.sendPlayerLocationPacket(receiver, radarPlayer, display);
     }
 
-    @Surrogate
-    @Inject(method = "sendPlayerTrackingData(Lnet/minecraft/class_3222;Z)V",
+    @Redirect(
+            method = "sendPlayerTrackingData(Lnet/minecraft/class_3222;Z)V",
             at = @At(value = "INVOKE",
-                    target = "Ljourneymap/common/network/dispatch/NetworkDispatcher;sendPlayerLocationPacket(Lnet/minecraft/class_3222;Lnet/minecraft/class_3222;Z)V",
-                    shift = At.Shift.BEFORE),
-            cancellable = true,
-            locals = LocalCapture.CAPTURE_FAILSOFT,
-            require = 0)
-    public void sendPlayerTrackingDataSurrogate(ServerPlayer entityPlayerMP,
-                                                boolean receiverOp,
-                                                CallbackInfo ci,
-                                                List serverPlayers,
-                                                GlobalProperties properties,
-                                                Iterator var5,
-                                                ServerPlayer radarPlayer,
-                                                boolean sameDimension,
-                                                boolean sneaking,
-                                                boolean invisible,
-                                                boolean hideOp,
-                                                boolean hideSpectators,
-                                                boolean seeUnderground,
-                                                boolean visible,
-                                                UUID playerId)
+                    target = "Ljourneymap/common/network/dispatch/NetworkDispatcher;sendPlayerLocationPacket(Lnet/minecraft/class_3222;Lnet/minecraft/class_3222;Z)V"),
+            require = 0
+    )
+    private void journeymapTeams$filterVisibilityIntermediary(NetworkDispatcher dispatcher,
+                                                              ServerPlayer receiver,
+                                                              ServerPlayer radarPlayer,
+                                                              boolean visible)
     {
-        boolean display = JourneyMapTeams.getInstance().getHandler().isVisible(entityPlayerMP, radarPlayer, receiverOp, visible);
-        Journeymap.getInstance().getDispatcher().sendPlayerLocationPacket(entityPlayerMP, radarPlayer, display);
-        ci.cancel();
+        boolean receiverOp = Journeymap.isOp(receiver);
+        boolean display = JourneyMapTeams.getInstance()
+                .getHandler()
+                .isVisible(receiver, radarPlayer, receiverOp, visible);
+        dispatcher.sendPlayerLocationPacket(receiver, radarPlayer, display);
     }
-
-
-//    @Inject(method = "isSelfHidden",
-//            at = @At(value = "RETURN",
-//                    shift = At.Shift.BEFORE),
-//            cancellable = true)
-//    public void sendPlayerTrackingData(ServerPlayer radarPlayer, GlobalProperties properties, boolean receiverOp, CallbackInfoReturnable<Boolean> cir)
-//    {
-//        boolean display = JourneyMapTeams.getInstance().getHandler().isVisible(radarPlayer, receiverOp, cir.getReturnValueZ());
-////        Journeymap.getInstance().getDispatcher().sendPlayerLocationPacket(entityPlayerMP, radarPlayer, display);
-//        cir.setReturnValue(display);
-//    }
 }
-

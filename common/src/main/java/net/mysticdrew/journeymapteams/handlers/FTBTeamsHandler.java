@@ -1,6 +1,5 @@
 package net.mysticdrew.journeymapteams.handlers;
 
-import com.mojang.logging.LogUtils;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.TeamRank;
 import dev.ftb.mods.ftbteams.api.property.TeamProperties;
@@ -17,27 +16,40 @@ public class FTBTeamsHandler extends AbstractHandler
     @Override
     public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
     {
+        // The receiver being op overrides team filtering (still respects JM's own visibility flag).
+        if (isOp)
+        {
+            return visible;
+        }
+
         var localTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(localPlayer.getUUID());
         var remoteTeam = FTBTeamsAPI.api().getManager().getTeamForPlayerID(remotePlayer.getUUID());
-        if (localTeam.isPresent() && remoteTeam.isPresent())
-        {
-            var allied = localTeam.get().getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
-                    || remoteTeam.get().getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
 
-            var inPlayerTeam = (remoteTeam.get().isPlayerTeam() && !remoteTeam.get().isPartyTeam());
-            var sameTeam = remoteTeam.get().getTeamId().equals(localTeam.get().getTeamId());
-            if ((sameTeam || allied) || isOp || inPlayerTeam)
-            {
-                return visible;
-            }
-
-            return false;
-        }
-        else if (localTeam.isEmpty() && remoteTeam.isPresent() && !isOp)
+        // No FTB team data on either side: hide. Every online player normally has a player team,
+        // so empty here means we cannot make a relationship decision.
+        if (localTeam.isEmpty() || remoteTeam.isEmpty())
         {
             return false;
         }
-        return visible;
+
+        var local = localTeam.get();
+        var remote = remoteTeam.get();
+
+        // Same FTB team (party members share a team id; personal player teams never collide).
+        if (remote.getTeamId().equals(local.getTeamId()))
+        {
+            return visible;
+        }
+
+        // Either side has marked the other as ALLY or higher on their team.
+        boolean allied = local.getRankForPlayer(remotePlayer.getUUID()).isAtLeast(TeamRank.ALLY)
+                || remote.getRankForPlayer(localPlayer.getUUID()).isAtLeast(TeamRank.ALLY);
+        if (allied)
+        {
+            return visible;
+        }
+
+        return false;
     }
 
     @Override

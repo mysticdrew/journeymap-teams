@@ -1,7 +1,5 @@
 package net.mysticdrew.journeymapteams.handlers;
 
-import com.mojang.logging.LogUtils;
-import journeymap.common.Journeymap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -15,25 +13,38 @@ public class VanillaTeamsHandler extends AbstractHandler
     @Override
     public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
     {
+        // The receiver being op overrides team filtering (still respects JM's own visibility flag).
+        if (isOp)
+        {
+            return visible;
+        }
+
         var localTeam = localPlayer.getTeam();
         var remoteTeam = remotePlayer.getTeam();
 
-        if (localTeam != null && remoteTeam != null)
+        // Neither side is on a vanilla team: nothing to filter on, defer to JM's decision.
+        if (localTeam == null && remoteTeam == null)
         {
-            var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
-
-            if ((remoteTeam.getName().equals(localTeam.getName()) || allied) || isOp)
-            {
-                return visible;
-            }
-
-            return false;
+            return visible;
         }
-        else if (localTeam == null && remoteTeam != null && !isOp)
+
+        // Exactly one side is teamed: hide. Symmetric with the unteamed-local case
+        // that already hid teamed remotes; the previous code leaked the reverse.
+        if (localTeam == null || remoteTeam == null)
         {
             return false;
         }
-        return visible;
+
+        // Same team (by registered name; same Team instance also matches),
+        // or a mod-defined alliance via either side.
+        if (localTeam.getName().equals(remoteTeam.getName())
+                || localTeam.isAlliedTo(remoteTeam)
+                || remoteTeam.isAlliedTo(localTeam))
+        {
+            return visible;
+        }
+
+        return false;
     }
 
     @Override
