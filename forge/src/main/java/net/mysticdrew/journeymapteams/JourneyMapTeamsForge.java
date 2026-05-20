@@ -1,8 +1,12 @@
 package net.mysticdrew.journeymapteams;
 
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
+import net.mysticdrew.journeymapteams.config.ServerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,12 @@ public class JourneyMapTeamsForge
             }
         }
         return list;
+    }
+
+    @SubscribeEvent
+    public static void onServerStarting(ServerStartingEvent event)
+    {
+        ServerConfig.load(FMLPaths.CONFIGDIR.get());
     }
 
 }

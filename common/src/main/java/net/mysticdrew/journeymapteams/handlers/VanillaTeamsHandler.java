@@ -2,6 +2,7 @@ package net.mysticdrew.journeymapteams.handlers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
+import net.mysticdrew.journeymapteams.config.ServerConfig;
 
 public class VanillaTeamsHandler extends AbstractHandler
 {
@@ -13,8 +14,9 @@ public class VanillaTeamsHandler extends AbstractHandler
     @Override
     public boolean isVisible(Player localPlayer, Player remotePlayer, boolean isOp, boolean visible)
     {
-        // The receiver being op overrides team filtering (still respects JM's own visibility flag).
-        if (isOp)
+        // The receiver being op overrides team filtering (still respects JM's own visibility
+        // flag), unless an admin disabled the bypass in the server config.
+        if (isOp && ServerConfig.getInstance().opsBypassTeamVisibility())
         {
             return visible;
         }

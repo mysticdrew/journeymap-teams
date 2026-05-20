@@ -1,9 +1,11 @@
 package net.mysticdrew.journeymapteams;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.mysticdrew.journeymapteams.config.ServerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,7 @@ public class JourneyMapTeamsFabric implements ModInitializer
     @Override
     public void onInitialize()
     {
-
+        ServerLifecycleEvents.SERVER_STARTING.register(server ->
+                ServerConfig.load(FabricLoader.getInstance().getConfigDir()));
     }
 }
