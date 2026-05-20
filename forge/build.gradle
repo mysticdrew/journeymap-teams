@@ -87,10 +87,10 @@ dependencies {
     implementation fg.deobf("com.teamresourceful.resourcefullib:resourcefullib-forge-${minecraft_version}:${resourceful_lib_version}")
 
     // FTB Teams Deps
-//    implementation fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
-//    implementation fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
-    compileOnly fg.deobf("curse.maven:ftb-teams-forge-404468:6130786")
-    compileOnly fg.deobf("curse.maven:ftb-library-forge-404465:6164053")
+    implementation fg.deobf("dev.ftb.mods:ftb-teams-forge:${ftb_teams_version}")
+    implementation fg.deobf("dev.ftb.mods:ftb-library-forge:${ftb_library_version}")
+//    compileOnly fg.deobf("curse.maven:ftb-teams-forge-404468:6130786")
+//    compileOnly fg.deobf("curse.maven:ftb-library-forge-404465:6164053")
     runtimeOnly fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
 
     compileOnly project(":common")
@@ -153,7 +153,7 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 
     apiToken = "${curseForgeApiKey}"
     def mainFile = upload(curseforge_project_id, jar)
-    mainFile.displayName = "${archivesBaseName}-${version}"
+    mainFile.displayName = "${mod_name}-forge-${version}"
     mainFile.releaseType = release_type
     mainFile.addModLoader("Forge")
     mainFile.addModLoader("NeoForge")
@@ -169,7 +169,7 @@ modrinth {
     token = "${modrinthApiKey}"
     projectId = modrinth_project_id
     versionNumber = "${version}"
-    versionName = "${archivesBaseName}-${version}"
+    versionName = "${mod_name}-forge-${version}"
     versionType = release_type
     uploadFile = jar
     gameVersions = ["${project.minecraft_version}"]

@@ -124,7 +124,7 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 
     apiToken = "${curseForgeApiKey}"
     def mainFile = upload(curseforge_project_id, remapJar)
-    mainFile.displayName = "${archivesBaseName}-${version}"
+    mainFile.displayName = "${mod_name}-fabric-${version}"
     mainFile.releaseType = release_type
     mainFile.addModLoader("Fabric", "Quilt")
     mainFile.addJavaVersion("Java 17")
@@ -134,16 +134,26 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
 }
 
 
-tasks.modrinth.dependsOn(tasks.build)
+tasks.modrinth.dependsOn(tasks.assemble)
 
 modrinth {
     token = "${modrinthApiKey}"
     projectId = modrinth_project_id
     versionNumber = "${version}"
-    versionName = "${archivesBaseName}-${version}"
+    versionName = "${mod_name}-fabric-${version}"
     versionType = release_type
     uploadFile = remapJar
     gameVersions = ["${project.minecraft_version}"]
     loaders = ["fabric", "quilt"]
     changelog = file("$project.buildDir/doc/changelog.html").exists() ? file("$project.buildDir/doc/changelog.html").text : null
+}
+
+// Ensure build is done prior to cursegradle tasks
+project.afterEvaluate {
+    project.tasks.findAll { task ->
+        (task.name.startsWith('curseforge') || task.name.startsWith('modrinth'))
+                && (task.name != 'curseforge' || task.name != 'modrinth')
+    }.each { projectTask ->
+        projectTask.dependsOn build
+    }
 }
