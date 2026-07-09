@@ -23,10 +23,12 @@ import static net.mysticdrew.journeymapteams.Constants.MOD_ID;
  * <p>The {@code handle(PacketContext)} method delegates to {@link ServerHook#onHandshake}
  * so loader-level code only needs to call {@link ServerHook#register} once at init time.</p>
  */
-public record BetterTeamsHandshakePacket(String addonVersion)
+public record BetterTeamsHandshakePacket(String addonVersion) implements CustomPacketPayload
 {
     public static final Identifier CHANNEL =
             Identifier.fromNamespaceAndPath(MOD_ID, "bt_handshake");
+    public static final CustomPacketPayload.Type<BetterTeamsHandshakePacket> TYPE =
+            new CustomPacketPayload.Type<>(CHANNEL);
     public static final StreamCodec<RegistryFriendlyByteBuf, BetterTeamsHandshakePacket> STREAM_CODEC =
             StreamCodec.ofMember(BetterTeamsHandshakePacket::encode, BetterTeamsHandshakePacket::new);
 
@@ -35,9 +37,10 @@ public record BetterTeamsHandshakePacket(String addonVersion)
         this(buf.readUtf());
     }
 
-    public static CustomPacketPayload.Type<CustomPacketPayload> type()
+    @Override
+    public Type<? extends CustomPacketPayload> type()
     {
-        return new CustomPacketPayload.Type<>(CHANNEL);
+        return TYPE;
     }
 
     public void encode(RegistryFriendlyByteBuf buf)

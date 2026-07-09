@@ -27,9 +27,13 @@ import static net.mysticdrew.journeymapteams.Constants.MOD_ID;
  * on the singleton cache.</p>
  */
 public record BetterTeamsSnapshotPacket(List<TeamRecord> teams, List<MemberRecord> members)
+        implements CustomPacketPayload
 {
     public static final Identifier CHANNEL =
             Identifier.fromNamespaceAndPath(MOD_ID, "bt_snapshot");
+
+    public static final CustomPacketPayload.Type<BetterTeamsSnapshotPacket> TYPE =
+            new CustomPacketPayload.Type<>(CHANNEL);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, BetterTeamsSnapshotPacket> STREAM_CODEC =
             StreamCodec.ofMember(BetterTeamsSnapshotPacket::encode, BetterTeamsSnapshotPacket::decode);
@@ -135,9 +139,10 @@ public record BetterTeamsSnapshotPacket(List<TeamRecord> teams, List<MemberRecor
         return new BetterTeamsSnapshotPacket(teams, members);
     }
 
-    public static CustomPacketPayload.Type<CustomPacketPayload> type()
+    @Override
+    public Type<? extends CustomPacketPayload> type()
     {
-        return new CustomPacketPayload.Type<>(CHANNEL);
+        return TYPE;
     }
 
     public void encode(RegistryFriendlyByteBuf buf)

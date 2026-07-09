@@ -34,6 +34,9 @@ public record BetterTeamsDeltaPacket(
     public static final Identifier CHANNEL =
             Identifier.fromNamespaceAndPath(MOD_ID, "bt_delta");
 
+    public static final CustomPacketPayload.Type<BetterTeamsDeltaPacket> TYPE =
+            new CustomPacketPayload.Type<>(CHANNEL);
+
     // Custom StreamCodec: encoding is conditional on kind, so composite() does not apply.
     public static final StreamCodec<RegistryFriendlyByteBuf, BetterTeamsDeltaPacket> STREAM_CODEC =
             new StreamCodec<>()
@@ -82,12 +85,7 @@ public record BetterTeamsDeltaPacket(
     @Override
     public Type<? extends CustomPacketPayload> type()
     {
-        return new CustomPacketPayload.Type<>(CHANNEL);
-    }
-
-    public static CustomPacketPayload.Type<CustomPacketPayload> staticType()
-    {
-        return new CustomPacketPayload.Type<>(CHANNEL);
+        return TYPE;
     }
 
     public static void handle(PacketContext<BetterTeamsDeltaPacket> ctx)

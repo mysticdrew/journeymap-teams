@@ -58,18 +58,15 @@ public class BetterTeamsServerPlugin implements IServerPlugin
         // The client plugin registers these on the client; both sides must register
         // before any packet can be exchanged.
         Network.registerPacket(
-                BetterTeamsHandshakePacket.type(),
-                BetterTeamsHandshakePacket.class,
+                BetterTeamsHandshakePacket.TYPE,
                 BetterTeamsHandshakePacket.STREAM_CODEC,
                 BetterTeamsHandshakePacket::handle)
             .registerPacket(
-                BetterTeamsSnapshotPacket.type(),
-                BetterTeamsSnapshotPacket.class,
+                BetterTeamsSnapshotPacket.TYPE,
                 BetterTeamsSnapshotPacket.STREAM_CODEC,
                 BetterTeamsSnapshotPacket::handle)
             .registerPacket(
-                BetterTeamsDeltaPacket.staticType(),
-                BetterTeamsDeltaPacket.class,
+                BetterTeamsDeltaPacket.TYPE,
                 BetterTeamsDeltaPacket.STREAM_CODEC,
                 BetterTeamsDeltaPacket::handle);
 

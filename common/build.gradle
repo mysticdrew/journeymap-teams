@@ -33,7 +33,7 @@ dependencies {
             version: "${journeymap_api_version}", changing: true
 
     compileOnly group: 'mysticdrew', name: 'common-networking-common',
-            version: "${common_networking_version}-${common_networking_mc_version}", changing: true
+            version: "${common_networking_version}", changing: true
 
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 

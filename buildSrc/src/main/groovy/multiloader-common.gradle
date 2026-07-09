@@ -72,10 +72,6 @@ repositories {
         url = 'https://www.cursemaven.com'
         content { includeGroup 'curse.maven' }
     }
-    maven {
-        name = 'JourneyMap'
-        url = 'https://jm.gserv.me/repository/maven-public/'
-    }
 }
 
 tasks.withType(JavaCompile).configureEach {

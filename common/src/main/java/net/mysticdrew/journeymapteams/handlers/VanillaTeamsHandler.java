@@ -56,7 +56,7 @@ public class VanillaTeamsHandler extends AbstractHandler
         if (localTeam != null && remoteTeam != null)
         {
             var allied = localTeam.isAlliedTo(remoteTeam) || remoteTeam.isAlliedTo(localTeam);
-            Integer teamColorValue = remoteTeam.getColor().getColor();
+            Integer teamColorValue = remoteTeam.getColor().get().rgb();
             int color = teamColorValue != null ? teamColorValue : properties.getTeamColor();
             return getColor(localTeam == remoteTeam, allied, color);
         }

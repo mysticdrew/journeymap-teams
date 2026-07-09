@@ -33,18 +33,15 @@ public class BetterTeamsClientPlugin implements IClientPlugin
         // which side's handle() fires (server-side for handshake, client-side
         // for snapshot and delta).
         Network.registerPacket(
-                BetterTeamsHandshakePacket.type(),
-                BetterTeamsHandshakePacket.class,
+                BetterTeamsHandshakePacket.TYPE,
                 BetterTeamsHandshakePacket.STREAM_CODEC,
                 BetterTeamsHandshakePacket::handle)
             .registerPacket(
-                BetterTeamsSnapshotPacket.type(),
-                BetterTeamsSnapshotPacket.class,
+                BetterTeamsSnapshotPacket.TYPE,
                 BetterTeamsSnapshotPacket.STREAM_CODEC,
                 BetterTeamsSnapshotPacket::handle)
             .registerPacket(
-                BetterTeamsDeltaPacket.staticType(),
-                BetterTeamsDeltaPacket.class,
+                BetterTeamsDeltaPacket.TYPE,
                 BetterTeamsDeltaPacket.STREAM_CODEC,
                 BetterTeamsDeltaPacket::handle);
 

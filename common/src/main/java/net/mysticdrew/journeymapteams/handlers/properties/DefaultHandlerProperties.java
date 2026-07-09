@@ -1,8 +1,9 @@
 package net.mysticdrew.journeymapteams.handlers.properties;
 
-import journeymap.api.v2.client.option.BooleanOption;
-import journeymap.api.v2.client.option.EnumOption;
-import journeymap.api.v2.client.option.OptionCategory;
+
+import journeymap.api.v2.common.option.BooleanOption;
+import journeymap.api.v2.common.option.EnumOption;
+import journeymap.api.v2.common.option.OptionCategory;
 
 import static net.mysticdrew.journeymapteams.Constants.MOD_ID;
 
