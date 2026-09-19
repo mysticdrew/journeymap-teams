@@ -82,6 +82,8 @@ tasks.register("publishCurseForge", TaskPublishCurseForge) {
     mainFile.addGameVersion("${project.minecraft_version}")
     mainFile.addRelation("journeymap", "requiredDependency")
     mainFile.changelogType = "html"
+    mainFile.addEnvironment("Client")
+    mainFile.addEnvironment("Server")
     mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
 }
 
