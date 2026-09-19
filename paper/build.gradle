@@ -53,21 +53,21 @@ task processDocs(type: Copy) {
 
 def publishJar = tasks.named("jar")
 
-tasks.register("publishCurseForge", TaskPublishCurseForge) {
-    dependsOn processDocs
-    apiToken = "${curseForgeApiKey}"
-    def mainFile = upload(curseforge_project_id, publishJar)
-    mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
-    mainFile.releaseType = release_type
-    // No addModLoader: CurseForge does not list Paper/Bukkit as a mod loader.
-    mainFile.addJavaVersion("Java 25")
-    mainFile.addGameVersion("${project.minecraft_version}")
-    mainFile.addRelation("journeymap", "requiredDependency")
-    mainFile.changelogType = "html"
-    mainFile.addEnvironment("Client")
-    mainFile.addEnvironment("Server")
-    mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
-}
+//tasks.register("publishCurseForge", TaskPublishCurseForge) {
+//    dependsOn processDocs
+//    apiToken = "${curseForgeApiKey}"
+//    def mainFile = upload(curseforge_project_id, publishJar)
+//    mainFile.displayName = "${project.mod_id}-${version}+${project.name}"
+//    mainFile.releaseType = release_type
+//    // No addModLoader: CurseForge does not list Paper/Bukkit as a mod loader.
+//    mainFile.addJavaVersion("Java 25")
+//    mainFile.addGameVersion("${project.minecraft_version}")
+//    mainFile.addRelation("journeymap", "requiredDependency")
+//    mainFile.changelogType = "html"
+//    mainFile.addEnvironment("Client")
+//    mainFile.addEnvironment("Server")
+//    mainFile.changelog = file(layout.buildDirectory.dir("doc").get().asFile.path + "/changelog.html")
+//}
 
 modrinth {
     token = "${modrinthApiKey}"
